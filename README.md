@@ -18,3 +18,10 @@
 - sqlite [alexcvzz]
 - Material Icon Theme [Philipp Kief]
 - Nuget Gallery [pcislo]
+
+## Fix for certificate issue when running
+
+```
+dotnet dev-certs https --clean
+dotnet dev-certs https --trust
+```
