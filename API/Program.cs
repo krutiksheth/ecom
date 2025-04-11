@@ -17,4 +17,13 @@ var app = builder.Build();
 //
 app.MapControllers();
 
+try
+{
+    await DbInitializer.InitDbAsync(app);
+}
+catch (Exception e)
+{
+    Console.WriteLine(e);
+}
+
 app.Run();

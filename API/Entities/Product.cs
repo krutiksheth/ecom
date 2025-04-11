@@ -14,5 +14,7 @@ public class Product
 
     public required string Brand { get; set; }
 
+    public required string Type { get; set; }
+
     public int QuantityInStock { get; set; }
 }
