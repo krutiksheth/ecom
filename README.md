@@ -25,3 +25,10 @@
 dotnet dev-certs https --clean
 dotnet dev-certs https --trust
 ```
+
+## Install Entity Framework tool
+
+```
+dotnet tool install --global dotnet-ef --version 9.0.0
+dotnet tool list -g
+```
