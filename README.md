@@ -3,6 +3,7 @@
 ## Tech Stack
 
 - .Net 9.0
+- React 19
 
 ## Tools
 
@@ -18,6 +19,8 @@
 - sqlite [alexcvzz]
 - Material Icon Theme [Philipp Kief]
 - Nuget Gallery [pcislo]
+- ES7+ React/Redux/React-Native snippets [dsznajder]
+- ESLint [Microsoft]
 
 ## Fix for certificate issue when running
 
