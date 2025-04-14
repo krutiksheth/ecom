@@ -3,6 +3,7 @@
 ## Tech Stack
 
 - .Net 9.0
+- React 19
 
 ## Tools
 
@@ -18,6 +19,8 @@
 - sqlite [alexcvzz]
 - Material Icon Theme [Philipp Kief]
 - Nuget Gallery [pcislo]
+- ES7+ React/Redux/React-Native snippets [dsznajder]
+- ESLint [Microsoft]
 
 ## Fix for certificate issue when running
 
@@ -32,3 +35,48 @@ dotnet dev-certs https --trust
 dotnet tool install --global dotnet-ef --version 9.0.0
 dotnet tool list -g
 ```
+
+## Install certificate for react app using vite
+
+```
+npm i vite-plugin-mkcert -D
+```
+
+Edit the `vite.config` file and add this
+
+```typescript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import mkcert from "vite-plugin-mkcert";
+
+// https://vite.dev/config/
+export default defineConfig({
+  server:{
+    port:3000
+  },
+  plugins: [react(), mkcert()],
+})
+
+```
+
+## Convert Json To Typescript [Link](https://transform.tools/json-to-typescript)
+
+## Installation of Material UI
+
+```shell
+npm install @mui/material@6 @emotion/react @emotion/styled
+npm install @fontsource/roboto
+npm install @mui/icons-material
+```
+
+Add this styles to `main.ts` file
+
+```typescript
+//main.ts
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
+```
+
