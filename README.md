@@ -21,6 +21,9 @@
 - Nuget Gallery [pcislo]
 - ES7+ React/Redux/React-Native snippets [dsznajder]
 - ESLint [Microsoft]
+- Angular Language Service [Angular]
+- Tailwind CSS Intellisense [Tailwind]
+- Auto Rename Tag [Jun Han]
 
 ## Fix for certificate issue when running
 
@@ -80,3 +83,71 @@ import '@fontsource/roboto/700.css';
 
 ```
 
+# Installation of angular
+
+This [link](https://angular.dev/reference/versions) tell which node is compatible with angular
+
+```shell
+npm install -g @angular/cli
+```
+
+If you get error like this `Error: error:0308010C:digital envelope routines::unsupported` while running `ng serve` add this environment variable
+
+```shell
+export NODE_OPTIONS="--openssl-legacy-provider"
+```
+If you are not able to update your angular cli
+
+```shell
+npm uninstall -g @angular/cli
+npm cache clean --force
+npm install -g @angular/cli@18.1.2
+```
+## Configured `https` for angular 
+
+- [Install mkcert](https://github.com/FiloSottile/mkcert)
+- Run this command in terminal `mkcert -install`
+- Inside project folder create a new folder `ssl` and run this command `mkcert localhost`
+- Edit `angular.json` file and add following code
+
+```js
+"serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "ssl": true,
+            "sslCert": "ssl/localhost.pem",
+            "sslKey": "ssl/localhost-key.pem"
+          }
+```
+## Install Angular Material
+
+```shell
+ng add @angular/material
+```
+
+## Install TailwindCss in angular
+
+```shell
+npm install -D tailwindcss postcss
+npx tailwindcss init
+```
+Edit `tailwind.config.js`
+
+```js
+ /** @type {import('tailwindcss').Config} */
+export default {
+   content: ["./src/**/*.{html,ts}"],
+   theme: {
+     extend: {},
+   },
+   plugins: [],
+ }
+```
+
+Now open you global `.css` file and add this
+
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
