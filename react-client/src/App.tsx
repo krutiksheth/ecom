@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
+import {Product} from "./product.ts";
 
 function App() {
   
-    const [products, setProducts] = useState<any[]>([]);
+    const [products, setProducts] = useState<Product[]>([]);
     
     useEffect(() => {
         fetch("https://localhost:5001/api/products")
@@ -10,13 +11,6 @@ function App() {
             .then(data => setProducts(data))
             .catch(err => console.log(err));
     },[])
-    
-    const addProduct = ()=>{
-        setProducts((prevProducts) => [...prevProducts, {
-            name: `Product ${prevProducts.length+1}`,
-            price:(prevProducts.length+1)*100,
-        }])
-    }
     
     return (
     <>
@@ -28,7 +22,6 @@ function App() {
                 </li>
             ))}
         </ul>
-        <button onClick={addProduct}>Add Product</button>
     </>
   )
 }

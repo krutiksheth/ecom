@@ -58,3 +58,5 @@ export default defineConfig({
 })
 
 ```
+
+## Convert Json To Typescript [Link](https://transform.tools/json-to-typescript)
