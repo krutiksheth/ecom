@@ -35,3 +35,26 @@ dotnet dev-certs https --trust
 dotnet tool install --global dotnet-ef --version 9.0.0
 dotnet tool list -g
 ```
+
+## Install certificate for react app using vite
+
+```
+npm i vite-plugin-mkcert -D
+```
+
+Edit the `vite.config` file and add this
+
+```typescript
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+import mkcert from "vite-plugin-mkcert";
+
+// https://vite.dev/config/
+export default defineConfig({
+  server:{
+    port:3000
+  },
+  plugins: [react(), mkcert()],
+})
+
+```
