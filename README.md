@@ -151,3 +151,12 @@ Now open you global `.css` file and add this
 @tailwind components;
 @tailwind utilities;
 ```
+
+## Useful commands for angular
+
+To generate a component
+
+```shell
+ng g c layout/header --skip-tests --dry-run
+ng g c layout/header --skip-tests
+```
