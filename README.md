@@ -4,6 +4,7 @@
 
 - .Net 9.0
 - React 19
+- Angular 18
 
 ## Tools
 
