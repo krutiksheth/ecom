@@ -1,4 +1,5 @@
 ﻿import {Product} from "../../app/models/product.ts";
+import ProductList from "./ProductList.tsx";
 
 type Props ={
     products: Product[];
@@ -6,13 +7,8 @@ type Props ={
 
 const Catalog = ({products}:Props) => {
     return (
-        <><ul>
-                {products.map((product) => (
-                    <li key={product.id}>
-                        {product.name}: {product.price}
-                    </li>
-                ))}
-            </ul>
+        <>
+            <ProductList products={products} />
         </>
     );
 };
