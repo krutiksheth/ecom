@@ -1,5 +1,7 @@
 import {useEffect, useState} from "react";
 import {Product} from "../models/product.ts";
+import Catalog from "../../features/catalog/Catalog.tsx";
+import {Container, Typography} from "@mui/material";
 
 function App() {
   
@@ -13,16 +15,10 @@ function App() {
     },[])
     
     return (
-    <>
-      <h1>Ecom</h1>
-        <ul>
-            {products.map((product, index) => (
-                <li key={index}>
-                    {index+1}: {product.name}: {product.price}
-                </li>
-            ))}
-        </ul>
-    </>
+    <Container maxWidth="xl">
+        <Typography variant="h4">Ecom</Typography>
+        <Catalog products={products} />
+    </Container>
   )
 }
 

@@ -60,3 +60,23 @@ export default defineConfig({
 ```
 
 ## Convert Json To Typescript [Link](https://transform.tools/json-to-typescript)
+
+## Installation of Material UI
+
+```shell
+npm install @mui/material@6 @emotion/react @emotion/styled
+npm install @fontsource/roboto
+npm install @mui/icons-material
+```
+
+Add this styles to `main.ts` file
+
+```typescript
+//main.ts
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
+```
+
