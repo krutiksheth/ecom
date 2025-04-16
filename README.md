@@ -39,6 +39,9 @@ dotnet dev-certs https --trust
 dotnet tool install --global dotnet-ef --version 9.0.0
 dotnet tool list -g
 ```
+___
+
+# React
 
 ## Install certificate for react app using vite
 
@@ -65,7 +68,7 @@ export default defineConfig({
 
 ## Convert Json To Typescript [Link](https://transform.tools/json-to-typescript)
 
-## Installation of Material UI
+## Installation of Material UI in react
 
 ```shell
 npm install @mui/material@6 @emotion/react @emotion/styled
@@ -83,8 +86,116 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 ```
+## Setup routing in react
 
-# Installation of angular
+Install this `react-router-dom`
+```shell
+npm i react-router-dom --legacy-peer-deps
+```
+
+Create a new file called `routes/Routes.tsx` inside `app` folder
+
+```
+
+export const routes = createBrowserRouter([
+    {
+        path: "/", // route route
+        element:<App />, // specify app component here
+        children: [
+            { path: "", element: <HomePage /> }, // specify home component
+            { path: "/catalog", element: <Catalog /> }, // specify catalog component
+            { path: "/catalog/:id", element: <ProductDetails /> }, // specify product details component
+            { path: "/about", element: <AboutPage /> }, // specify about component 
+            { path: "/contact", element: <ContactPage /> }, // specify contact component 
+        ]
+    }
+])
+
+```
+
+Now edit `main.tsx` file and add `RouterProvider`
+
+```
+
+createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+        <RouterProvider router={routes} />
+</StrictMode>,
+)
+
+```
+
+Now edit `app.tsx` file and replace it with `outlet`
+
+```
+function App() {
+    const [darkMode, setDarkMode] = useState(true);
+    const palleteType = darkMode ? 'dark' : 'light';
+    const darkTheme = createTheme({
+        palette: {
+            mode: palleteType,
+            background: {
+                default:(palleteType === "dark") ? "#eaeaea" : "#121212",
+            }
+        },
+    });
+
+    return (
+        <>
+            <ThemeProvider theme={darkTheme}>
+        <CssBaseline />
+        <NavBar darkMode={darkMode} toggleDarkMode={()=> setDarkMode(!darkMode)}></NavBar>
+    <Box sx={{minHeight: '100vh',
+        backgroundColor: (darkMode ?  '#121212':'#eaeaea' ), py:6}}>
+    <Container maxWidth="xl" sx={{mt:8}}>
+    <Outlet /> <!-- Replaced catalog with outlet component-->
+    </Container>
+    </Box>
+    </ThemeProvider>
+    </>
+)
+}
+
+export default App
+```
+
+Now in your `navbar` component create this list and use it with 'NavLink'
+
+```
+const midLinks = [
+    { title: "catalog", path: "/catalog" },
+    { title: "about", path: "/about" },
+    { title: "contact", path: "/contact" },
+];
+
+const rightLinks = [
+    { title: "login", path: "/login" },
+    { title: "register", path: "/register" },
+];
+
+const NavBar = ({ darkMode, toggleDarkMode}: Props) => {
+
+    return (
+        <>
+            ...
+            ...
+              <List sx={{display: "flex"}}>
+                    {midLinks.map(({ title, path}) => (
+                        <ListItem sx={{color:'inherit', typography:'h6'}} component={NavLink} to={path} key={path}>{title.toUpperCase()}</ListItem>
+                    ))}
+                
+        </>
+    )
+}
+
+...
+```
+
+___
+
+# Angular
+
+## Installation of angular
 
 This [link](https://angular.dev/reference/versions) tell which node is compatible with angular
 
