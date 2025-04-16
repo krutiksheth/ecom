@@ -272,3 +272,10 @@ To generate a component
 ng g c layout/header --skip-tests --dry-run
 ng g c layout/header --skip-tests
 ```
+
+To generate a service
+
+```shell
+ng g s core/services/shop --skip-tests --dry-run
+ng g s core/services/shops --skip-tests
+```
