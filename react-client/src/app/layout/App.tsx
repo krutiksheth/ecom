@@ -1,5 +1,4 @@
 import {useState} from "react";
-import Catalog from "../../features/catalog/Catalog.tsx";
 import {Box, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import NavBar from "./NavBar.tsx";
 import { Outlet } from "react-router-dom";
