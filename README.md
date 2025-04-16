@@ -159,6 +159,38 @@ function App() {
 export default App
 ```
 
+Now in your `navbar` component create this list and use it with 'NavLink'
+
+```
+const midLinks = [
+    { title: "catalog", path: "/catalog" },
+    { title: "about", path: "/about" },
+    { title: "contact", path: "/contact" },
+];
+
+const rightLinks = [
+    { title: "login", path: "/login" },
+    { title: "register", path: "/register" },
+];
+
+const NavBar = ({ darkMode, toggleDarkMode}: Props) => {
+
+    return (
+        <>
+            ...
+            ...
+              <List sx={{display: "flex"}}>
+                    {midLinks.map(({ title, path}) => (
+                        <ListItem sx={{color:'inherit', typography:'h6'}} component={NavLink} to={path} key={path}>{title.toUpperCase()}</ListItem>
+                    ))}
+                
+        </>
+    )
+}
+
+...
+```
+
 ___
 
 # Angular
