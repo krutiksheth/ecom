@@ -279,3 +279,48 @@ To generate a service
 ng g s core/services/shop --skip-tests --dry-run
 ng g s core/services/shops --skip-tests
 ```
+
+## How to pass data to different component in angular similar to react `props`
+
+In your component file say for example `product-item.component.ts` declare this variable
+
+```js
+@Input() product?: Product;
+```
+
+And you can use this in the component like this
+
+```js
+ <app-product-item [product]="product"></app-product-item>
+```
+
+## `Observables` vs `Promises`?
+
+### Observables
+
+- A sequence of items that arrive asynchronously over time like API or Http request
+- They are more powerful that `promises`
+- Are cancellable
+- Stream data in multiple pipelines
+- Array like operations
+- Can be created from other sources like events
+- They can be subscribed to
+- Observables -> 1 cancel and (2 fail or succeed -> subscribe -> map -> filter -> data)
+
+### Promises
+
+- Has one pipeline
+- Typically used with async data return
+- Not easy to cancel
+- Promises -> then -> 1 success and 2 fail
+
+### Http, Observables and RxJS working
+
+- Http get request from shopservice
+- Receive the observables and cast it to a Products Array
+- Subscribe to the observable from the component
+- Assign the products array to a local variable for use in the components template
+
+## Angular Forms Module
+
+Angular supports two-way bindings `[]` represents `input` and `()` represents `output` or `events` property
