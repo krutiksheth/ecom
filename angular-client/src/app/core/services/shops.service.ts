@@ -3,6 +3,8 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {filters} from "../../shared/models/filters";
 import {Product} from "../../shared/models/product";
 import {of} from "rxjs";
+import {ShopParams} from "../../shared/models/shopParams";
+
 
 @Injectable({
   providedIn: 'root'
@@ -14,24 +16,25 @@ export class ShopsService {
   brands: string[] = [];
   types: string[] = [];
 
-  getProduct(brands?: string[], types?: string[], sort?: string) {
+  getProduct(shopParams: ShopParams) {
     let params = new HttpParams();
 
-    if(brands && brands.length > 0) {
-     params= params.append('brands', brands.join(','));
+    if(shopParams.brands && shopParams.brands.length > 0) {
+     params= params.append('brands', shopParams.brands.join(','));
     }
 
-    if(types && types.length > 0) {
-      params= params.append('types', types.join(','));
+    if(shopParams.types && shopParams.types.length > 0) {
+      params= params.append('types', shopParams.types.join(','));
     }
 
-    if(sort){
-      params= params.append('OrderBy', sort);
+    if(shopParams.sort){
+      params= params.append('OrderBy', shopParams.sort);
     }
 
-    params = params.append("pageSize", 20);
+    params = params.append("pageSize", shopParams.pageSize);
+    params = params.append("pageNumber", shopParams.pageNumber);
 
-    return this.http.get<Product[]>(this.baseUrl+'/products', {params: params});
+    return this.http.get<Product[]>(this.baseUrl+'/products', {params: params, observe: 'response'});
   }
 
   getFilters(){
