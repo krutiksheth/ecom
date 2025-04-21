@@ -196,6 +196,7 @@ const NavBar = ({ darkMode, toggleDarkMode}: Props) => {
 
 - What is redux?
 
+- Redux is a synchronous store
 - Its like a in memory database stored on client and removes props drilling
 
   ![Redux Flow](./react-client/public/images/redux-store.png)
@@ -226,7 +227,26 @@ npm i react-redux
 
 Click on this [link](https://redux.js.org/tutorials/typescript-quick-start#define-typed-hooks)
 
----
+## Redux Thunk
+
+- Its a function that is returned by another function and be executed later.
+- In redux, thunk allows action creators to return function instead of plain object.
+
+  ![Redux Thunk](./react-client/public/images/redux-thunk.png)
+
+  ![Redux Thunk Boilerplate](./react-client/public/images/redux-thunk-boilerplate.png)
+
+## RTQ Query (replacement for Redux Thunk)
+
+- Reduced boilerplate when compared to thunk
+- Builtin data fetching
+- Typescript support
+- Optimistic updates
+- Automatic caching
+- Server state focused
+- Built in middleware
+
+![RTQ Query](./react-client/public/images/rtk-query-demo.png)
 
 # Angular
 
