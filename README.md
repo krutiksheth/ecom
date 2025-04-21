@@ -192,6 +192,38 @@ const NavBar = ({ darkMode, toggleDarkMode}: Props) => {
 ...
 ```
 
+## Store for Global Statemanagement
+
+- What is redux?
+
+- Its like a in memory database stored on client and removes props drilling
+
+  ![Redux Flow](./react-client/public/images/redux-store.png)
+
+- It provides some hooks like `useSelector(state => state.counter.value)` for displaying/reading value and `useDispatch(increment())` for updating the state without mutating (changing) the old state and creating a new state which will update the value and cause react to rerender the UI
+- Redux flow
+
+  ![Redux Flow](./react-client/public/images/redux-flow.png)
+
+- Reducer is a function that takes current statem and action and then returns the new state
+
+- Best Practices for Redux
+  - Donot mutate state (ie clone it and update that new state)
+  - Reducers must not have side effects like calling API
+  - Donot have non serializable values in state or actions
+  - 1 Store per app
+
+## Setup
+
+- Installation
+
+```shell
+npm i @reduxjs/toolkit
+npm i react-redux
+```
+
+
+
 ---
 
 # Angular

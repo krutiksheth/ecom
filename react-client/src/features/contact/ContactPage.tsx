@@ -1,7 +1,12 @@
-﻿const ContactPage = () => {
+﻿import {useSelector} from "react-redux";
+
+const ContactPage = () => {
+
+    const data = useSelector((state:any) => state.data)
+    
     return (
         <div>
-            Contact
+             Count : {data}
         </div>
     );
 };
