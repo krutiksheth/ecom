@@ -222,7 +222,9 @@ npm i @reduxjs/toolkit
 npm i react-redux
 ```
 
+## Cleaner way and optimize way to use useSelector and useDispatch with types
 
+Click on this [link](https://redux.js.org/tutorials/typescript-quick-start#define-typed-hooks)
 
 ---
 

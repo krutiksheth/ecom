@@ -1,4 +1,6 @@
-﻿export type CounterState= {
+﻿import {createSlice} from "@reduxjs/toolkit";
+
+export type CounterState= {
     data: number
 }
 
@@ -6,14 +8,32 @@ const initialState: CounterState = {
     data: 42,
 }
 
-export function increment(amount: number=1) {
+
+export const counterSlice = createSlice({
+    name:"counter",
+    initialState: {
+        data: 42
+    },
+    reducers:{
+        increment(state,action){
+            state.data +=  action.payload;
+        },
+        decrement(state,action){
+            state.data -=  action.payload;
+        }
+    }
+})
+
+export const {increment,decrement} = counterSlice.actions;
+
+export function incrementLegacy(amount: number=1) {
     return {
         type: "INCREMENT",
         payload: amount,
     }
 }
 
-export function decrement(amount: number=1) {
+export function decrementLegacy(amount: number=1) {
     return {
         type: "DECREMENT",
         payload: amount,

@@ -1,11 +1,10 @@
-﻿import {useDispatch, useSelector} from "react-redux";
-import {Button, ButtonGroup, Typography} from "@mui/material";
+﻿import {Button, ButtonGroup, Typography} from "@mui/material";
 import {decrement, increment} from "./counterReducer.ts";
-
+import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
 const ContactPage = () => {
 
-    const data = useSelector((state:any) => state.data)
-    const dispatch = useDispatch();
+    const data = useAppSelector((state) => state.counter.data);
+    const dispatch = useAppDispatch();
     
     return (
         <div>
@@ -13,8 +12,8 @@ const ContactPage = () => {
                 The data is {data}
             </Typography>
             <ButtonGroup variant="contained">
-              <Button color="error" onClick={()=> dispatch(decrement())}>Decrement</Button>  
-              <Button color="success" onClick={()=> dispatch(increment())}>Increment</Button>  
+              <Button color="error" onClick={()=> dispatch(decrement(1))}>Decrement</Button>  
+              <Button color="success" onClick={()=> dispatch(increment(1))}>Increment</Button>  
             </ButtonGroup>
         </div>
     );
