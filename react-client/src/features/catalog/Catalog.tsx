@@ -1,21 +1,26 @@
-﻿import {Product} from "../../app/models/product.ts";
-import ProductList from "./ProductList.tsx";
-import {useEffect, useState} from "react";
+﻿import ProductList from "./ProductList.tsx";
+import {useFetchProductsQuery} from "./catalogApi.ts";
 
 const Catalog = () =>{
 
-const [products, setProducts] = useState<Product[]>([]);
-
-useEffect(() => {
-    fetch("https://localhost:5001/api/products")
-        .then(res => res.json())
-        .then(data => setProducts(data))
-        .catch(err => console.log(err));
-}, [])
+ const { data, isLoading } = useFetchProductsQuery();   
+ 
+ if (isLoading || !data) {
+     return <div>Loading...</div>;
+ }
+ 
+// const [products, setProducts] = useState<Product[]>([]);
+//
+// useEffect(() => {
+//     fetch("https://localhost:5001/api/products")
+//         .then(res => res.json())
+//         .then(data => setProducts(data))
+//         .catch(err => console.log(err));
+// }, [])
     
     return (
         <>
-            <ProductList products={products} />
+            <ProductList products={data} />
         </>
     );
 };
