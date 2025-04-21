@@ -13,7 +13,7 @@ export const catalogApi= createApi({
         }),
         fetchProductDetails:builder.query<Product, number>({
             query:(productId)=>({
-                url:`product/${productId}`,
+                url:`products/${productId}`,
             })
         })
     })     
