@@ -1,5 +1,6 @@
 ﻿import {useDispatch, useSelector} from "react-redux";
 import {Button, ButtonGroup, Typography} from "@mui/material";
+import {decrement, increment} from "./counterReducer.ts";
 
 const ContactPage = () => {
 
@@ -12,8 +13,8 @@ const ContactPage = () => {
                 The data is {data}
             </Typography>
             <ButtonGroup variant="contained">
-              <Button color="error" onClick={()=>dispatch({ type: "DECREMENT"})}>Decrement</Button>  
-              <Button color="success" onClick={()=>dispatch({ type: "INCREMENT"})}>Increment</Button>  
+              <Button color="error" onClick={()=> dispatch(decrement())}>Decrement</Button>  
+              <Button color="success" onClick={()=> dispatch(increment())}>Increment</Button>  
             </ButtonGroup>
         </div>
     );
