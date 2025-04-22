@@ -2,6 +2,7 @@
 import counterReducer, {counterSlice} from "../../features/contact/counterReducer.ts";
 import {useDispatch, useSelector} from "react-redux";
 import {catalogApi} from "../../features/catalog/catalogApi.ts";
+import {uiSlice} from "../layout/uiSlice.ts";
 
 export function configureLegacyStore(){
     return legacy_createStore(counterReducer);
@@ -10,7 +11,8 @@ export function configureLegacyStore(){
 export const store= configureStore({
     reducer: {
         [catalogApi.reducerPath]: catalogApi.reducer,
-        counter: counterSlice.reducer
+        counter: counterSlice.reducer,
+        ui: uiSlice.reducer
     },
     middleware:(getDefaultMiddleware)=>
         getDefaultMiddleware().concat(catalogApi.middleware)

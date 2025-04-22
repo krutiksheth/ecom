@@ -1,4 +1,5 @@
 import {BaseQueryApi, FetchArgs, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
+import { startLoading, stopLoading } from "../layout/uiSlice.ts";
 
 const customBaseQuery = fetchBaseQuery({
     baseUrl:"https://localhost:5001/api"
@@ -9,9 +10,14 @@ const sleep = () =>
 
 
 export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: object) =>{
+    
+    api.dispatch(startLoading());
+    
     await sleep();
     
     const result = await customBaseQuery(args, api, extraOptions);
+
+    api.dispatch(stopLoading());
     
     if(result.error){
         const { status, data } = result.error;
