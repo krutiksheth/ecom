@@ -1,4 +1,5 @@
 using API.Data;
+using API.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -22,11 +23,17 @@ builder.Services.AddDbContext<StoreContext>(opt =>
 });
 builder.Services.AddCors();
 
+// AddScoped -> service will be available when request comes in and will be available for the entirity of the request
+// AddTransient -> service will only be created for specific method where it is needed
+// AddSingleton -> service will be instantiated when application starts and is disposed when application ends
+builder.Services.AddTransient<ExceptionMiddleware>();
+
 var app = builder.Build();
 
 //
-// Middleware
+// Middleware (ordering is important)
 //
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.MapControllers();
 
