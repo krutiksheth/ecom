@@ -1,12 +1,14 @@
-﻿import {createBrowserRouter} from "react-router-dom";
+﻿import {createBrowserRouter, Navigate} from "react-router-dom";
 import App from "../layout/App.tsx";
 import HomePage from "../../features/home/HomePage.tsx";
 import Catalog from "../../features/catalog/Catalog.tsx";
 import ProductDetails from "../../features/catalog/ProductDetails.tsx";
 import AboutPage from "../../features/about/AboutPage.tsx";
 import ContactPage from "../../features/contact/ContactPage.tsx";
+import ServerError from "../errors/ServerError.tsx";
+import NotFound from "../errors/NotFound.tsx";
 
-export const routes = createBrowserRouter([
+export const router = createBrowserRouter([
     {
         path: "/", // route route
         element:<App />, // specify app component here
@@ -16,6 +18,9 @@ export const routes = createBrowserRouter([
             { path: "/catalog/:id", element: <ProductDetails /> }, // specify product details component
             { path: "/about", element: <AboutPage /> }, // specify about component 
             { path: "/contact", element: <ContactPage /> }, // specify contact component 
+            { path: "/server-error", element: <ServerError /> }, // specify server-error component 
+            { path: "/not-found", element: <NotFound /> }, // specify not-found component 
+            { path: "*", element: <Navigate replace to="/not-found"></Navigate>}, // specify wildcard 
         ]
     }
 ])
