@@ -455,3 +455,44 @@ Angular supports two-way bindings `[]` represents `input` and `()` represents `o
 - Minimal component code
 - Automatic track of the form and its data(handled by Angular)
 - Unit testing is another challenge
+
+## Setup Angular Routing
+
+First create different component using this command in the terminal
+
+```shell
+ng g c features/home --skip-tests
+```
+
+Now edit `app.routes.ts` file and add different component routes
+
+```js
+export const routes: Routes = [
+  { path: "", component: HomeComponent },
+  { path: "shop", component: ShopComponent },
+  { path: "shop/:id", component: ProductDetailsComponent },
+  { path: "**", redirectTo: "", pathMatch: "full" },
+];
+```
+
+Now goto `app.component.ts` file and make sure you have `RouterOutlet` present in the import section
+
+```js
+@Component({
+  selector: "app-root",
+  standalone: true,
+  imports: [RouterOutlet, HeaderComponent, ShopComponent], //<-- RouterOutlet
+  templateUrl: "./app.component.html",
+  styleUrl: "./app.component.scss",
+})
+export class AppComponent {}
+```
+
+Now edit template file `app.component.html` file and add `router-outlet`
+
+```html
+<app-header></app-header>
+<div class="container mt-6 px-10">
+  <router-outlet></router-outlet>
+</div>
+```
