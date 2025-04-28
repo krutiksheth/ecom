@@ -455,3 +455,85 @@ Angular supports two-way bindings `[]` represents `input` and `()` represents `o
 - Minimal component code
 - Automatic track of the form and its data(handled by Angular)
 - Unit testing is another challenge
+
+## Setup Angular Routing
+
+First create different component using this command in the terminal
+
+```shell
+ng g c features/home --skip-tests
+```
+
+Now edit `app.routes.ts` file and add different component routes
+
+```js
+export const routes: Routes = [
+  { path: "", component: HomeComponent },
+  { path: "shop", component: ShopComponent },
+  { path: "shop/:id", component: ProductDetailsComponent },
+  { path: "**", redirectTo: "", pathMatch: "full" },
+];
+```
+
+Now goto `app.component.ts` file and make sure you have `RouterOutlet` present in the import section
+
+```js
+@Component({
+  selector: "app-root",
+  standalone: true,
+  imports: [RouterOutlet, HeaderComponent, ShopComponent], //<-- RouterOutlet
+  templateUrl: "./app.component.html",
+  styleUrl: "./app.component.scss",
+})
+export class AppComponent {}
+```
+
+Now edit template file `app.component.html` file and add `router-outlet`
+
+```html
+<app-header></app-header>
+<div class="container mt-6 px-10">
+  <router-outlet></router-outlet>
+</div>
+```
+
+Now in order to configure nav links to work add `routerLink` to anchor tags
+
+```html
+...
+<nav class="flex gap-3 my-2 uppercase text-xl">
+  <a routerLink="/">Home</a>
+  <a routerLink="/shop">Shop</a>
+  <a routerLink="/">Contact</a>
+</nav>
+```
+
+Now in order to make links active you need to use `routerLinkActive="active"` and define a css for `a.active` class as well as add ` [routerLinkActiveOptions]="{exact:true}"` otherwise all links ending with `/` would be treated as active
+
+```html
+<nav class="flex gap-3 my-2 uppercase text-2xl">
+  <a
+    routerLink="/"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{exact:true}"
+    >Home</a
+  >
+  <a routerLink="/shop" routerLinkActive="active">Shop</a>
+  <a routerLinkActive="active">Contact</a>
+</nav>
+```
+
+## How to read parameter from url
+
+In the component use `ActivatedRoute` in order to read id parameter from url `/products/1`
+
+```js
+export class ProductDetailsComponent {
+
+  private shopService = inject(ShopsService);
+  private activatedRoute = inject(ActivatedRoute);
+  product:Product;
+
+
+}
+```
