@@ -1,4 +1,13 @@
-﻿import {ButtonGroup, Container, Typography, Button, Alert, AlertTitle, List, ListItem} from "@mui/material";
+﻿import {
+    ButtonGroup,
+    Container,
+    Typography,
+    Button,
+    List,
+    ListItem,
+    Paper,
+    Divider
+} from "@mui/material";
 import {
     useLazyGet400ErrorQuery,
     useLazyGet404ErrorQuery,
@@ -52,12 +61,19 @@ const AboutPage = () => {
                 </Button>
             </ButtonGroup>
             {validationErrors.length > 0 && (
-                <Alert severity="error">
-                    <AlertTitle>Validation Errors</AlertTitle>
-                    <List>
-                        {validationErrors.map(validationError => <ListItem key={validationError}>{validationError}</ListItem>)}   
-                    </List>
-                </Alert>
+                <Paper>
+                    <>
+                        <Typography gutterBottom variant="h5" sx={{px:4, pt:2}} color="secondary">
+                            Validation Errors
+                        </Typography>
+                        <Divider></Divider>
+                        <Typography variant="body1" sx={{p:4}}>
+                            <List>
+                                {validationErrors.map(validationError => <ListItem key={validationError}>{validationError}</ListItem>)}
+                            </List>
+                        </Typography>
+                    </>                     
+                </Paper>
             )}
         </Container>
     );

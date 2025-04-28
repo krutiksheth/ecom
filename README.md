@@ -94,11 +94,11 @@ Install this `react-router-dom`
 npm i react-router-dom --legacy-peer-deps
 ```
 
-Create a new file called `routes/Routes.tsx` inside `app` folder
+Create a new file called `routes/Router.tsx` inside `app` folder
 
 ```
 
-export const routes = createBrowserRouter([
+export const router = createBrowserRouter([
     {
         path: "/", // route route
         element:<App />, // specify app component here
@@ -120,7 +120,7 @@ Now edit `main.tsx` file and add `RouterProvider`
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <RouterProvider router={routes} />
+        <RouterProvider router={router} />
 </StrictMode>,
 )
 
@@ -128,7 +128,7 @@ createRoot(document.getElementById('root')!).render(
 
 Now edit `app.tsx` file and replace it with `outlet`
 
-```
+```js
 function App() {
     const [darkMode, setDarkMode] = useState(true);
     const palleteType = darkMode ? 'dark' : 'light';
@@ -162,7 +162,7 @@ export default App
 
 Now in your `navbar` component create this list and use it with 'NavLink'
 
-```
+```js
 const midLinks = [
     { title: "catalog", path: "/catalog" },
     { title: "about", path: "/about" },
@@ -190,6 +190,30 @@ const NavBar = ({ darkMode, toggleDarkMode}: Props) => {
 }
 
 ...
+```
+
+First add this to your `router.tsx` file
+
+```js
+{ path: "/server-error", element: <ServerError /> }, // specify contact component
+```
+
+Now in the `errorApi.tsx` file add this to navigate to errors page
+
+```js
+//To navigate to different page and pass data
+router.navigate("/server-error", {
+  state:{
+    error: <your error object>
+  }
+});
+
+```
+
+In `ServerError.tsx` file you can retrieve state data this way:
+
+```js
+const { state } = useLocation();
 ```
 
 ## Store for Global Statemanagement
@@ -255,6 +279,7 @@ Installation
 ```shell
 npm i react-toastify
 ```
+
 Setup toast provider in `main.ts` file
 
 ```js
@@ -270,7 +295,6 @@ createRoot(document.getElementById('root')!).render(
 )
 
 ```
-
 
 # Angular
 
