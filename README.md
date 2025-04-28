@@ -522,3 +522,18 @@ Now in order to make links active you need to use `routerLinkActive="active"` an
   <a routerLinkActive="active">Contact</a>
 </nav>
 ```
+
+## How to read parameter from url
+
+In the component use `ActivatedRoute` in order to read id parameter from url `/products/1`
+
+```js
+export class ProductDetailsComponent {
+
+  private shopService = inject(ShopsService);
+  private activatedRoute = inject(ActivatedRoute);
+  product:Product;
+
+
+}
+```
