@@ -248,6 +248,30 @@ Click on this [link](https://redux.js.org/tutorials/typescript-quick-start#defin
 
 ![RTQ Query](./react-client/public/images/rtk-query-demo.png)
 
+## Install react-toastify for tost notification
+
+Installation
+
+```shell
+npm i react-toastify
+```
+Setup toast provider in `main.ts` file
+
+```js
+import "react-toastify/dist/ReactToastify.css";
+
+createRoot(document.getElementById('root')!).render(
+        <StrictMode>
+          <Provider store={store}>
+            <ToastContainer position="bottom-right" hideProgressBar theme="colored"></ToastContainer>
+            <RouterProvider router={routes} />
+          </Provider>
+        </StrictMode>,
+)
+
+```
+
+
 # Angular
 
 ## Installation of angular
