@@ -496,3 +496,29 @@ Now edit template file `app.component.html` file and add `router-outlet`
   <router-outlet></router-outlet>
 </div>
 ```
+
+Now in order to configure nav links to work add `routerLink` to anchor tags
+
+```html
+...
+<nav class="flex gap-3 my-2 uppercase text-xl">
+  <a routerLink="/">Home</a>
+  <a routerLink="/shop">Shop</a>
+  <a routerLink="/">Contact</a>
+</nav>
+```
+
+Now in order to make links active you need to use `routerLinkActive="active"` and define a css for `a.active` class as well as add ` [routerLinkActiveOptions]="{exact:true}"` otherwise all links ending with `/` would be treated as active
+
+```html
+<nav class="flex gap-3 my-2 uppercase text-2xl">
+  <a
+    routerLink="/"
+    routerLinkActive="active"
+    [routerLinkActiveOptions]="{exact:true}"
+    >Home</a
+  >
+  <a routerLink="/shop" routerLinkActive="active">Shop</a>
+  <a routerLinkActive="active">Contact</a>
+</nav>
+```
