@@ -296,6 +296,12 @@ createRoot(document.getElementById('root')!).render(
 
 ```
 
+## If you are using axios for making api call this is how you can use interceptors for configuring different error
+
+(Axios Interceptors)[https://github.com/TryCatchLearn/Restore/blob/main/client/src/app/api/agent.ts]
+
+---
+
 # Angular
 
 ## Installation of angular
@@ -536,4 +542,76 @@ export class ProductDetailsComponent {
 
 
 }
+```
+
+## Angular Interceptor for handling error and access tokens
+
+To create an interceptor use the following command:
+
+```sh
+ng g interceptor core/interceptors/error --skip-tests
+```
+
+If we dont want to subscribe to observable and want to manipulate response that comes back from api we use `pipes` and we use `catchError` from rxjs and add following code
+
+```js
+export const errorInterceptor: HttpInterceptorFn = (req, next) => {
+  const router = inject(Router);
+  return next(req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 400) {
+        alert(error.error.title || error.error);
+      }
+      if (error.status === 401) {
+        alert(error.error.title || error.error);
+      }
+      if (error.status === 404) {
+        router.navigateByUrl("/not-found");
+      }
+      if (error.status === 500) {
+        router.navigateByUrl("/server-error");
+      }
+
+      return throwError(() => error);
+    })
+  );
+};
+```
+
+Now make sure to inject this in `app.config.ts`
+
+```js
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideAnimationsAsync(),
+    provideHttpClient(withInterceptors([errorInterceptor])), // <-- add one or more interceptors
+  ],
+};
+```
+
+## How to pass data from `router.navigateByUrl`
+
+Define a const and configure your state property
+
+```js
+  const navigationExtras: NavigationExtras = { state: {
+            error: <your data>
+          }}
+
+  router.navigateByUrl("/server-error", navigationExtras);
+```
+
+Now in order to retrieve your value in that component simply do this
+
+```js
+
+  error?: any;
+
+constructor(private router: Router){
+    const navigation = this.router.getCurrentNavigation();
+    this.error = navigation?.extras.state?.['error'];
+  }
+
 ```
