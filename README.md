@@ -590,3 +590,28 @@ export const appConfig: ApplicationConfig = {
   ],
 };
 ```
+
+## How to pass data from `router.navigateByUrl`
+
+Define a const and configure your state property
+
+```js
+  const navigationExtras: NavigationExtras = { state: {
+            error: <your data>
+          }}
+
+  router.navigateByUrl("/server-error", navigationExtras);
+```
+
+Now in order to retrieve your value in that component simply do this
+
+```js
+
+  error?: any;
+
+constructor(private router: Router){
+    const navigation = this.router.getCurrentNavigation();
+    this.error = navigation?.extras.state?.['error'];
+  }
+
+```
