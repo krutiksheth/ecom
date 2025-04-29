@@ -1,5 +1,5 @@
 import {HttpErrorResponse, HttpInterceptorFn} from '@angular/common/http';
-import {Router} from "@angular/router";
+import {NavigationExtras, Router} from "@angular/router";
 import {inject} from "@angular/core";
 import {catchError, throwError} from "rxjs";
 import {SnackbarService} from "../services/snackbar.service";
@@ -11,7 +11,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 400) {
-        debugger;
+
         const modelStateErrors = [];
         if (error.error.errors) {
           for (const key in error.error.errors) {
@@ -31,7 +31,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         router.navigateByUrl("/not-found");
       }
       if (error.status === 500) {
-        router.navigateByUrl("/server-error");
+        const navigationExtras: NavigationExtras = { state: {
+            error: error.error
+          }}
+        router.navigateByUrl("/server-error", navigationExtras);
       }
 
       return throwError(() => error);
