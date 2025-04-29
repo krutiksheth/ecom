@@ -1,14 +1,12 @@
 import {Component, inject} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {MatButton} from "@angular/material/button";
-import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-test-error',
   standalone: true,
   imports: [
-    MatButton,
-    MatDivider
+    MatButton
   ],
   templateUrl: './test-error.component.html',
   styleUrl: './test-error.component.scss'
@@ -16,6 +14,7 @@ import {MatDivider} from "@angular/material/divider";
 export class TestErrorComponent {
    baseUrl="https://localhost:5001/api";
    private http = inject(HttpClient);
+   validationErrors?: string[];
 
    get400Error() {
      this.http.get(this.baseUrl+"/buggy/bad-request").subscribe({
@@ -41,7 +40,7 @@ export class TestErrorComponent {
   getValidationError() {
     this.http.get(this.baseUrl+"/buggy/validation-error").subscribe({
       next: response => console.log(response),
-      error: error => console.log(error)
+      error: error => this.validationErrors= error
     });
   }
 

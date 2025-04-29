@@ -26,7 +26,7 @@ public class BuggyController : BaseApiController
     public IActionResult GetValidationError()
     {
        ModelState.AddModelError("Problem1", "This is first error");
-       ModelState.AddModelError("Problem2", "This is secind error");
+       ModelState.AddModelError("Problem2", "This is second error");
        
        return ValidationProblem();
     }
