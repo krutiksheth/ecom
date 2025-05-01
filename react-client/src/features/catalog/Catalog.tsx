@@ -2,10 +2,13 @@
 import {useFetchProductsQuery} from "./catalogApi.ts";
 import {Grid2} from "@mui/material";
 import Filters from "./Filters.tsx";
+import {useAppSelector} from "../../app/store/store.ts";
 
 const Catalog = () =>{
 
- const { data, isLoading } = useFetchProductsQuery();   
+    const productParams= useAppSelector(
+        (state) => state.catalog);
+    const { data, isLoading } = useFetchProductsQuery(productParams);
  
  if (isLoading || !data) {
      return <div>Loading...</div>;
