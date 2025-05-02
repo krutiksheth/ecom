@@ -1,5 +1,8 @@
 import {useFetchFiltersQuery} from "./catalogApi.ts";
-import {Box, Paper, TextField, FormControl, FormControlLabel, Radio, FormGroup, Checkbox} from "@mui/material";
+import {Box, Paper, TextField, FormControlLabel, FormGroup, Checkbox} from "@mui/material";
+import RadioButtonGroup from "../../app/shared/RadioButtonGroup.tsx";
+import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
+import { setOrderBy } from "./catalogSlice.ts";
 
 const sortOptions = [
     { value: 'name', label: 'Alphabetical' },
@@ -10,6 +13,9 @@ const sortOptions = [
 const Filters = () => {
     
     const {data} = useFetchFiltersQuery();
+    const {orderBy} = useAppSelector(state => state.catalog);
+    const dispatch = useAppDispatch();
+    
     console.log("data", data);
     
     return (
@@ -18,15 +24,9 @@ const Filters = () => {
                 <TextField label="Search Products" variant="outlined" fullWidth></TextField>
             </Paper>
             <Paper sx={{p:3}}>
-                <FormControl fullWidth variant="outlined">
-                    {sortOptions.map(({label, value}) => (
-                        <FormControlLabel 
-                            control={<Radio sx={{py:0.7}} />} 
-                            label={label}
-                            value={value}
-                            key={label}></FormControlLabel>
-                    ))}
-                </FormControl>
+                <RadioButtonGroup options={sortOptions} 
+                                  onChange={(e)=> dispatch(setOrderBy(e.target.value))} 
+                                  selectedValue={orderBy}></RadioButtonGroup>
             </Paper>
             <Paper sx={{p:3}}>
                 <FormGroup>
