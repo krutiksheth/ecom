@@ -1,8 +1,9 @@
 import {useFetchFiltersQuery} from "./catalogApi.ts";
-import {Box, Paper, TextField, FormControlLabel, FormGroup, Checkbox} from "@mui/material";
+import {Box, Paper, TextField, Typography} from "@mui/material";
 import RadioButtonGroup from "../../app/shared/RadioButtonGroup.tsx";
 import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
-import { setOrderBy } from "./catalogSlice.ts";
+import {setBrands, setOrderBy, setTypes} from "./catalogSlice.ts";
+import CheckboxButtons from "../../app/shared/CheckboxButtons.tsx";
 
 const sortOptions = [
     { value: 'name', label: 'Alphabetical' },
@@ -13,10 +14,10 @@ const sortOptions = [
 const Filters = () => {
     
     const {data} = useFetchFiltersQuery();
-    const {orderBy} = useAppSelector(state => state.catalog);
+    const {orderBy, brands, types} = useAppSelector(state => state.catalog);
     const dispatch = useAppDispatch();
     
-    console.log("data", data);
+    if(!data?.brands || !data?.types) return <Typography>Loading...</Typography>
     
     return (
         <Box display="flex" flexDirection="column" gap={3}>
@@ -29,26 +30,16 @@ const Filters = () => {
                                   selectedValue={orderBy}></RadioButtonGroup>
             </Paper>
             <Paper sx={{p:3}}>
-                <FormGroup>
-                    {data && data.brands.map((brand, index) => (
-                        <FormControlLabel
-                            control={<Checkbox sx={{py:0.7, fontSize:40}}  color="secondary"/>}
-                            label={brand}
-                            key={index}>
-                        </FormControlLabel>
-                    ))}
-                </FormGroup>
+              <CheckboxButtons 
+                  checked={brands} 
+                  onChange={(items: string[])=>dispatch(setBrands(items))} 
+                  items={data.brands}></CheckboxButtons>
             </Paper>
             <Paper sx={{p:3}}>
-                <FormGroup>
-                    {data && data.types.map((type, index) => (
-                        <FormControlLabel
-                            control={<Checkbox sx={{py:0.7, fontSize:40}}  color="secondary"/>}
-                            label={type}
-                            key={index}>
-                        </FormControlLabel>
-                    ))}
-                </FormGroup>
+                <CheckboxButtons
+                    checked={types}
+                    onChange={(items: string[])=>dispatch(setTypes(items))}
+                    items={data.types}></CheckboxButtons>
             </Paper>
         </Box>
     );

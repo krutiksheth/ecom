@@ -24,6 +24,14 @@ export  const catalogSlice = createSlice({
             state.searchTerm = action.payload;
             state.page = 1;
         },
+        setBrands: (state, action)=>{
+            state.brands = action.payload;
+            state.page = 1;
+        },
+        setTypes: (state, action)=>{
+            state.types = action.payload;
+            state.page = 1;
+        },
         setOrderBy: (state, action)=>{
             state.orderBy = action.payload;
             state.page = 1;
@@ -34,4 +42,4 @@ export  const catalogSlice = createSlice({
     }
 })
 
-export const  { setPage, setPageSize, setOrderBy, setSearchTerm, reset } = catalogSlice.actions;
+export const  { setPage, setPageSize, setOrderBy, setSearchTerm, setBrands, setTypes, reset } = catalogSlice.actions;
