@@ -2,7 +2,7 @@ import {createSlice} from "@reduxjs/toolkit";
 import {ProductParams} from "../../app/models/productParams.ts";
 
 const initialState :ProductParams= {
-    page:1,
+    pageNumber:1,
     pageSize:8,
     brands:[],
     types:[],
@@ -15,26 +15,26 @@ export  const catalogSlice = createSlice({
     initialState,
     reducers: {
         setPage: (state, action)=>{
-            state.page = action.payload;
+            state.pageNumber = action.payload;
         },
         setPageSize: (state, action)=>{
             state.pageSize = action.payload;
         },
         setSearchTerm: (state, action)=>{
             state.searchTerm = action.payload;
-            state.page = 1;
+            state.pageNumber = 1;
         },
         setBrands: (state, action)=>{
             state.brands = action.payload;
-            state.page = 1;
+            state.pageNumber = 1;
         },
         setTypes: (state, action)=>{
             state.types = action.payload;
-            state.page = 1;
+            state.pageNumber = 1;
         },
         setOrderBy: (state, action)=>{
             state.orderBy = action.payload;
-            state.page = 1;
+            state.pageNumber = 1;
         },
         reset: ()=>{
             return initialState;

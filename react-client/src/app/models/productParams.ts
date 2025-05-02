@@ -3,6 +3,6 @@ export type ProductParams = {
     searchTerm?: string;
     brands: string[];
     types: string[];
-    page: number;
+    pageNumber: number;
     pageSize: number;
 }

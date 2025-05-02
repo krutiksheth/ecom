@@ -1,19 +1,23 @@
 ﻿import ProductList from "./ProductList.tsx";
 import {useFetchProductsQuery} from "./catalogApi.ts";
-import {Grid2} from "@mui/material";
+import {Grid2, Typography} from "@mui/material";
 import Filters from "./Filters.tsx";
-import {useAppSelector} from "../../app/store/store.ts";
+import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
+import AppPagination from "../../app/shared/AppPagination.tsx";
+import {setPage} from "./catalogSlice.ts";
 
-const Catalog = () =>{
+const Catalog = () => {
 
-    const productParams= useAppSelector(
+    const productParams = useAppSelector(
         (state) => state.catalog);
-    const { data, isLoading } = useFetchProductsQuery(productParams);
- 
- if (isLoading || !data) {
-     return <div>Loading...</div>;
- }
- 
+    const {data, isLoading} = useFetchProductsQuery(productParams);
+    const dispatch = useAppDispatch();
+
+
+    if (isLoading || !data) {
+        return <div>Loading...</div>;
+    }
+
 // const [products, setProducts] = useState<Product[]>([]);
 //
 // useEffect(() => {
@@ -22,14 +26,18 @@ const Catalog = () =>{
 //         .then(data => setProducts(data))
 //         .catch(err => console.log(err));
 // }, [])
-    
+
     return (
         <Grid2 container spacing={4}>
             <Grid2 size={3}>
                 <Filters/>
             </Grid2>
             <Grid2 size={9}>
-                <ProductList products={data} />
+                {data.items.length>0 ? (<> <ProductList products={data.items}/>
+                    <AppPagination pagination={data.pagination}
+                                   onPageChange={(page) => dispatch(setPage(page))}></AppPagination></>):(
+                    <Typography variant="h5">There are no results for this filter</Typography>) 
+                }
             </Grid2>
         </Grid2>
     );
