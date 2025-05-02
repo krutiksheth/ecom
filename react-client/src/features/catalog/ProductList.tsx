@@ -1,5 +1,5 @@
 ﻿import {Product} from "../../app/models/product.ts";
-import {Box} from "@mui/material";
+import {Grid2} from "@mui/material";
 import ProductCard from "./ProductCard.tsx";
 
 type Props ={
@@ -8,11 +8,13 @@ type Props ={
 
 const ProductList = ({products}: Props) => {
     return (
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap:3, justifyContent: "center" }}>
+        <Grid2 container spacing={3}>
             {products.map((product) => (
-                <ProductCard key={product.id} product={product}/>
+                <Grid2 key={product.id} size={3} display="flex">
+                    <ProductCard key={product.id} product={product}/>
+                </Grid2>
             ))}
-        </Box>
+        </Grid2>
     );
 };
 

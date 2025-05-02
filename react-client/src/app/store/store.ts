@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {catalogApi} from "../../features/catalog/catalogApi.ts";
 import {uiSlice} from "../layout/uiSlice.ts";
 import {errorApi} from "../../features/about/errorApi.ts";
+import { catalogSlice } from "../../features/catalog/catalogSlice.ts";
 
 export function configureLegacyStore(){
     return legacy_createStore(counterReducer);
@@ -14,7 +15,8 @@ export const store= configureStore({
         [catalogApi.reducerPath]: catalogApi.reducer,
         [errorApi.reducerPath]: errorApi.reducer,
         counter: counterSlice.reducer,
-        ui: uiSlice.reducer
+        ui: uiSlice.reducer,
+        catalog: catalogSlice.reducer,
     },
     middleware:(getDefaultMiddleware)=>
         getDefaultMiddleware().concat(catalogApi.middleware, errorApi.middleware),

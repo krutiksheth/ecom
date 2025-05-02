@@ -1,6 +1,6 @@
 import {Box, Container, createTheme, CssBaseline, ThemeProvider} from "@mui/material";
 import NavBar from "./NavBar.tsx";
-import { Outlet } from "react-router-dom";
+import {Outlet, ScrollRestoration} from "react-router-dom";
 import {useAppSelector} from "../store/store.ts";
 
 function App() {
@@ -20,6 +20,7 @@ function App() {
     return (
         <>
             <ThemeProvider theme={darkTheme}>
+                <ScrollRestoration/>
                 <CssBaseline />
                 <NavBar ></NavBar>
                 <Box sx={{minHeight: '100vh', 
