@@ -1,8 +1,7 @@
-import {useFetchFiltersQuery} from "./catalogApi.ts";
-import {Box, Paper, TextField, Typography} from "@mui/material";
+import {Box, Button, Paper, TextField} from "@mui/material";
 import RadioButtonGroup from "../../app/shared/RadioButtonGroup.tsx";
 import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
-import {setBrands, setOrderBy, setTypes} from "./catalogSlice.ts";
+import {reset, setBrands, setOrderBy, setTypes} from "./catalogSlice.ts";
 import CheckboxButtons from "../../app/shared/CheckboxButtons.tsx";
 
 const sortOptions = [
@@ -11,13 +10,15 @@ const sortOptions = [
     { value: 'price', label: 'Price: Low to High' }
 ];
 
-const Filters = () => {
+type Props = {
+    filtersData:{brands:string[], types:string[]};
+}
+
+const Filters = ({filtersData: data}: Props) => {
     
-    const {data} = useFetchFiltersQuery();
+   
     const {orderBy, brands, types} = useAppSelector(state => state.catalog);
     const dispatch = useAppDispatch();
-    
-    if(!data?.brands || !data?.types) return <Typography>Loading...</Typography>
     
     return (
         <Box display="flex" flexDirection="column" gap={3}>
@@ -41,6 +42,7 @@ const Filters = () => {
                     onChange={(items: string[])=>dispatch(setTypes(items))}
                     items={data.types}></CheckboxButtons>
             </Paper>
+            <Button onClick={()=>dispatch(reset())}> Reset Filters</Button>
         </Box>
     );
 };
