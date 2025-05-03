@@ -57,7 +57,7 @@ public class BasketController(StoreContext context, IMapper mapper) : BaseApiCon
         //get basket
         var basket = await FindBasket();
 
-        if (basket == null) return NoContent();
+        if (basket == null)  return BadRequest("Problem remove item to Basket");
 
         //remove item or reduce quantity
         basket.RemoveItem(productId, quantity);
