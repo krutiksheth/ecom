@@ -1,5 +1,8 @@
-﻿namespace API.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace API.Entities;
+
+[Table("BasketItems")]
 public class BasketItem
 {
     public int Id { get; set; }
@@ -10,4 +13,8 @@ public class BasketItem
     public int ProductId { get; set; }
 
     public required Product Product { get; set; } = null!;
+
+    public int BasketId { get; set; }
+    
+    public Basket Basket { get; set; } = null!;
 }
