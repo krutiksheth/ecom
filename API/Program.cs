@@ -27,6 +27,7 @@ builder.Services.AddCors();
 // AddTransient -> service will only be created for specific method where it is needed
 // AddSingleton -> service will be instantiated when application starts and is disposed when application ends
 builder.Services.AddTransient<ExceptionMiddleware>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
