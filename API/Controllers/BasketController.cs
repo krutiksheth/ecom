@@ -1,11 +1,13 @@
 ﻿using API.Data;
+using API.DTOs;
 using API.Entities;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public class BasketController(StoreContext context) : BaseApiController
+public class BasketController(StoreContext context, IMapper mapper) : BaseApiController
 {
     private readonly string basketCookieName = "BasketId";
 
@@ -16,7 +18,7 @@ public class BasketController(StoreContext context) : BaseApiController
 
         if (basket == null) return NoContent();
 
-        return Ok(basket);
+        return Ok(mapper.Map<BasketDto>(basket));
     }
 
     [HttpPost]
@@ -46,7 +48,7 @@ public class BasketController(StoreContext context) : BaseApiController
         }
         
         // This returns location header 
-        return CreatedAtAction(nameof(GetBasket), basket);
+        return CreatedAtAction(nameof(GetBasket), mapper.Map<BasketDto>(basket));
     }
 
     [HttpDelete]
