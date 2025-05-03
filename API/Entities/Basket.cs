@@ -36,12 +36,12 @@ public class Basket
         }
     }
 
-    public void RemoveItem(Product product, int quantity)
+    public void RemoveItem(int productId, int quantity)
     {
         if (quantity <= 0)
             throw new ArgumentException("Quantity must be greater than zero");
 
-        var existingItem = FindItem(product.Id);
+        var existingItem = FindItem(productId);
 
         if (existingItem == null) return;
 
