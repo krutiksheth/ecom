@@ -1,68 +1,73 @@
 ﻿import {AppBar, IconButton, List, ListItem, Toolbar, Typography, Badge, Box, LinearProgress} from "@mui/material";
 import {DarkMode, LightMode, ShoppingCart} from "@mui/icons-material";
-import { NavLink } from "react-router-dom";
+import {Link, NavLink} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../store/store.ts";
 import {setDarkMode} from "./uiSlice.ts";
+import {useFetchBasketQuery} from "../../features/basket/basketApi.ts";
 
 const midLinks = [
-    { title: "catalog", path: "/catalog" },
-    { title: "about", path: "/about" },
-    { title: "contact", path: "/contact" },
+    {title: "catalog", path: "/catalog"},
+    {title: "about", path: "/about"},
+    {title: "contact", path: "/contact"},
 ];
 
 const rightLinks = [
-    { title: "login", path: "/login" },
-    { title: "register", path: "/register" },
+    {title: "login", path: "/login"},
+    {title: "register", path: "/register"},
 ];
 
-const navStyles= {
-    color:'inherit',
-    typography:'h6',
-    textDecoration:"none",
-    "&:hover":{
-        color:"grey.500"
+const navStyles = {
+    color: 'inherit',
+    typography: 'h6',
+    textDecoration: "none",
+    "&:hover": {
+        color: "grey.500"
     },
-    "&.active":{
-        color:"#baecf9"
+    "&.active": {
+        color: "#baecf9"
     }
 }
 
 const NavBar = () => {
-    
-    const { isLoading, darkMode } = useAppSelector(state=>state.ui);
+
+    const {isLoading, darkMode} = useAppSelector(state => state.ui);
     const dispatch = useAppDispatch();
+    const {data: basket} = useFetchBasketQuery();// <-- since we are caching this won't trigger fetch and grab data
+    const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0) || 0;
     
     return (
         <AppBar position="fixed">
-            <Toolbar sx={{display:"flex", justifyContent:"space-between", alignItems:"center"}}>
-                <Box sx={{display:"flex", alignItems:"center"}}>
+            <Toolbar sx={{display: "flex", justifyContent: "space-between", alignItems: "center"}}>
+                <Box sx={{display: "flex", alignItems: "center"}}>
                     <Typography sx={navStyles} component={NavLink} to="/" variant="h6">Ecom</Typography>
-                    <IconButton onClick={()=> dispatch(setDarkMode())}>
-                        {darkMode? <DarkMode />:<LightMode sx={{color:"yellow"}}/>}
+                    <IconButton onClick={() => dispatch(setDarkMode())}>
+                        {darkMode ? <DarkMode/> : <LightMode sx={{color: "yellow"}}/>}
                     </IconButton>
                 </Box>
 
                 <List sx={{display: "flex"}}>
-                    {midLinks.map(({ title, path}) => (
-                        <ListItem sx={navStyles} component={NavLink} to={path} key={path}>{title.toUpperCase()}</ListItem>
+                    {midLinks.map(({title, path}) => (
+                        <ListItem sx={navStyles} component={NavLink} to={path}
+                                  key={path}>{title.toUpperCase()}</ListItem>
                     ))}
                 </List>
-                <Box sx={{display:"flex", alignItems:"center"}}>
-                    <IconButton  size="large" sx={{color:'inherit'}} >
-                        <Badge badgeContent="4" color="secondary">
-                            <ShoppingCart />
+                <Box sx={{display: "flex", alignItems: "center"}}>
+                    <IconButton component={Link} to="/basket" size="large" sx={{color: 'inherit'}}>
+                        <Badge badgeContent={itemCount} color="secondary">
+                            <ShoppingCart/>
                         </Badge>
                     </IconButton>
                     <List sx={{display: "flex"}}>
-                        {rightLinks.map(({ title, path}) => (
-                            <ListItem sx={navStyles} component={NavLink} to={path} key={path}>{title.toUpperCase()}</ListItem>
+                        {rightLinks.map(({title, path}) => (
+                            <ListItem sx={navStyles} component={NavLink} to={path}
+                                      key={path}>{title.toUpperCase()}</ListItem>
                         ))}
                     </List>
                 </Box>
             </Toolbar>
-            { isLoading && (<Box sx={{ width:"100%" }}><LinearProgress color="secondary" /></Box>)}
+            {isLoading && (<Box sx={{width: "100%"}}><LinearProgress color="secondary"/></Box>)}
         </AppBar>
-    
+
     );
 };
 

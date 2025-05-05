@@ -40,6 +40,12 @@ dotnet tool install --global dotnet-ef --version 9.0.0
 dotnet tool list -g
 ```
 
+## In order to send cookie with request make sure in `program.cs` file you should have `AllowCredentials()` set in `UseCors and make sure `AllowAnyOrigin`is replaced with`WithOrigins`
+
+```#
+pp.UseCors(options => options.WithOrigins("https://localhost:3000","https://localhost:4200").AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+```
+
 ---
 
 # React
@@ -300,6 +306,233 @@ createRoot(document.getElementById('root')!).render(
 
 (Axios Interceptors)[https://github.com/TryCatchLearn/Restore/blob/main/client/src/app/api/agent.ts]
 
+## If you want to include cookies in react client in React Query make sure to inculde `credentials:"include"` in `baseQueyApi`
+
+```js
+const customBaseQuery = fetchBaseQuery({
+  baseUrl: "https://localhost:5001/api",
+  credentials: "include",
+});
+```
+
+# 🛒 Basket API with RTK Query (How to deactivate Caching simple way)
+
+## 📁 File: `basketApi.ts`
+
+```ts
+export const basketApi = createApi({
+  reducerPath: "basketApi",
+  baseQuery: baseQueryWithErrorHandling,
+  tagTypes: ["Basket"], // 👈 Tag type used for cache management
+  endpoints: (builder) => ({
+    fetchBasket: builder.query<Basket, void>({
+      query: () => ({ url: "basket" }),
+      providesTags: ["Basket"], // 👈 Caches this query result with tag "Basket"
+    }),
+    addBasketItem: builder.mutation<
+      Basket,
+      { productId: number; quantity: number }
+    >({
+      query: ({ productId, quantity }) => ({
+        url: `basket?productId=${productId}&&quantity=${quantity}`,
+        method: "POST",
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          dispatch(basketApi.util.invalidateTags(["Basket"])); // 👈 Triggers refetch of fetchBasket
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    }),
+    removeBasketItem: builder.mutation<
+      void,
+      { productId: number; quantity: number }
+    >({
+      query: ({ productId, quantity }) => ({
+        url: `basket?productId=${productId}&&quantity=${quantity}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Basket"], // 👈 Automatically refetches queries tagged with "Basket"
+    }),
+  }),
+});
+```
+
+## 🧠 Explanation
+
+### 🔖 `tagTypes`
+
+```ts
+tagTypes: ["Basket"];
+```
+
+Defines the logical tag used to identify cached data. This must be registered at the root of the API.
+
+### 🏷️ `providesTags`
+
+```ts
+providesTags: ["Basket"];
+```
+
+Used on **queries** to label their cached data with the specified tag (`'Basket'`).
+
+### ❌ `invalidateTags`
+
+```ts
+invalidateTags: ["Basket"];
+```
+
+Used on **mutations** to notify RTK Query that any data previously tagged with `'Basket'` should be re-fetched.
+
+Alternatively, for advanced scenarios, you can use `onQueryStarted` to call:
+
+```ts
+dispatch(basketApi.util.invalidateTags(["Basket"]));
+```
+
+## ✅ Example Flow
+
+1. `fetchBasket` runs and caches the response with tag `'Basket'`.
+2. `addBasketItem` succeeds and invalidates `'Basket'`.
+3. RTK Query automatically re-runs `fetchBasket` to get updated data.
+
+# 🛒 Optimistic Update in RTK Query — `addBasketItem` Example
+
+This document explains how the `addBasketItem` mutation uses an **optimistic update** strategy in a Redux Toolkit Query setup for a shopping basket.
+
+## 📌 What is an Optimistic Update?
+
+An **optimistic update** updates the UI **before** the server confirms the change. If the server request fails, the UI state is **rolled back**.
+
+✅ Pros: Faster and smoother user experience.  
+❌ Cons: Requires rollback handling in case of failure.
+
+## 🔧 Mutation Definition
+
+```ts
+addBasketItem: builder.mutation<Basket, { product: Product, quantity: number }>({{
+  query: ({ product, quantity }) => ({
+    url: `basket?productId=${product.id}&&quantity=${quantity}`,
+    method: "POST",
+  }),
+  onQueryStarted: async ({ product, quantity }, { dispatch, queryFulfilled }) => {
+    const patchResult = dispatch(
+      basketApi.util.updateQueryData("fetchBasket", undefined, (draft) => {
+        const existingItem = draft.items.find(item => item.productId === product.id);
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          draft.items.push(new Item(product, quantity));
+        }
+      })
+    );
+
+    try {
+      await queryFulfilled;
+      dispatch(basketApi.util.invalidateTags(["Basket"]));
+    } catch (error) {
+      console.log(error);
+      patchResult.undo();
+    }
+  }
+})
+```
+
+## 🧠 Step-by-Step Explanation
+
+### 1. 🖌️ Optimistically Update the UI
+
+```ts
+basketApi.util.updateQueryData("fetchBasket", undefined, (draft) => {
+  // Modify cached data immediately
+});
+```
+
+- Updates the local cache before waiting for server confirmation.
+- Creates a more responsive experience for the user.
+
+### 2. ⏳ Await Real Server Response
+
+```ts
+await queryFulfilled;
+```
+
+- Waits for the actual result of the POST request.
+
+### 3. ♻️ Invalidate Tag (Optional)
+
+```ts
+dispatch(basketApi.util.invalidateTags(["Basket"]));
+```
+
+- Ensures that the data is refetched if needed (optional for extra safety).
+
+### 4. ❌ Rollback on Error
+
+```ts
+patchResult.undo();
+```
+
+- If the server call fails, this reverts the UI to its previous state.
+
+# ⚠️ Non-Serializable Value in Redux State
+
+## ❌ The Problem
+
+When working with Redux (especially with **RTK - Redux Toolkit**), you might encounter a warning like this:
+
+```
+A non-serializable value was detected in the state
+```
+
+This often happens when you push class instances like this into the Redux store:
+
+```ts
+draft.items.push(isBasketItem(product) ? product : new Item(product, quantity));
+```
+
+Here, `Item` is likely a **class**, and class instances are **not serializable** by default. Redux (and Redux DevTools) expects all state to be **plain JavaScript objects** (POJOs), arrays, numbers, strings, etc., which are easily serializable.
+
+## 📦 Why It Matters
+
+Redux state should be serializable because:
+
+- It enables **time-travel debugging** via Redux DevTools.
+- It allows Redux to easily save/restore state.
+- It avoids hard-to-track bugs during state updates.
+- It aligns with best practices enforced by Redux Toolkit's default middleware.
+
+## ✅ The Solution
+
+Instead of using `new Item(...)`, construct a plain object manually:
+
+```ts
+draft.items.push({
+  productId: product.id,
+  productName: product.name,
+  quantity: quantity,
+  price: product.price,
+  // other necessary fields...
+});
+```
+
+Or define a **factory function** that returns a plain object:
+
+````ts
+function createBasketItem(product, quantity) {
+  return {
+    productId: product.id,
+    name: product.name,
+    quantity,
+    price: product.price,
+  };
+}
+
+// Then use it
+draft.items.push(createBasketItem(product, quantity));
+
 ---
 
 # Angular
@@ -310,7 +543,7 @@ This [link](https://angular.dev/reference/versions) tell which node is compatibl
 
 ```shell
 npm install -g @angular/cli
-```
+````
 
 If you get error like this `Error: error:0308010C:digital envelope routines::unsupported` while running `ng serve` add this environment variable
 
