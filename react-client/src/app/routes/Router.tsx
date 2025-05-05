@@ -8,6 +8,7 @@ import ContactPage from "../../features/contact/ContactPage.tsx";
 import ServerError from "../errors/ServerError.tsx";
 import NotFound from "../errors/NotFound.tsx";
 import BasketPage from "../../features/basket/BasketPage.tsx";
+import CheckoutPage from "../../features/checkout/CheckoutPage.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -20,6 +21,7 @@ export const router = createBrowserRouter([
             { path: "/about", element: <AboutPage /> }, // specify about component 
             { path: "/contact", element: <ContactPage /> }, // specify contact component 
             { path: "/basket", element: <BasketPage /> }, // specify contact component 
+            { path: "/checkout", element: <CheckoutPage /> }, // specify contact component 
             { path: "/server-error", element: <ServerError /> }, // specify server-error component 
             { path: "/not-found", element: <NotFound /> }, // specify not-found component 
             { path: "*", element: <Navigate replace to="/not-found"></Navigate>}, // specify wildcard 

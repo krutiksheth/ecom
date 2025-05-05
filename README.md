@@ -402,14 +402,12 @@ dispatch(basketApi.util.invalidateTags(["Basket"]));
 
 This document explains how the `addBasketItem` mutation uses an **optimistic update** strategy in a Redux Toolkit Query setup for a shopping basket.
 
-
 ## 📌 What is an Optimistic Update?
 
 An **optimistic update** updates the UI **before** the server confirms the change. If the server request fails, the UI state is **rolled back**.
 
 ✅ Pros: Faster and smoother user experience.  
 ❌ Cons: Requires rollback handling in case of failure.
-
 
 ## 🔧 Mutation Definition
 
@@ -442,7 +440,6 @@ addBasketItem: builder.mutation<Basket, { product: Product, quantity: number }>(
 })
 ```
 
-
 ## 🧠 Step-by-Step Explanation
 
 ### 1. 🖌️ Optimistically Update the UI
@@ -450,7 +447,7 @@ addBasketItem: builder.mutation<Basket, { product: Product, quantity: number }>(
 ```ts
 basketApi.util.updateQueryData("fetchBasket", undefined, (draft) => {
   // Modify cached data immediately
-})
+});
 ```
 
 - Updates the local cache before waiting for server confirmation.
@@ -480,6 +477,62 @@ patchResult.undo();
 
 - If the server call fails, this reverts the UI to its previous state.
 
+# ⚠️ Non-Serializable Value in Redux State
+
+## ❌ The Problem
+
+When working with Redux (especially with **RTK - Redux Toolkit**), you might encounter a warning like this:
+
+```
+A non-serializable value was detected in the state
+```
+
+This often happens when you push class instances like this into the Redux store:
+
+```ts
+draft.items.push(isBasketItem(product) ? product : new Item(product, quantity));
+```
+
+Here, `Item` is likely a **class**, and class instances are **not serializable** by default. Redux (and Redux DevTools) expects all state to be **plain JavaScript objects** (POJOs), arrays, numbers, strings, etc., which are easily serializable.
+
+## 📦 Why It Matters
+
+Redux state should be serializable because:
+
+- It enables **time-travel debugging** via Redux DevTools.
+- It allows Redux to easily save/restore state.
+- It avoids hard-to-track bugs during state updates.
+- It aligns with best practices enforced by Redux Toolkit's default middleware.
+
+## ✅ The Solution
+
+Instead of using `new Item(...)`, construct a plain object manually:
+
+```ts
+draft.items.push({
+  productId: product.id,
+  productName: product.name,
+  quantity: quantity,
+  price: product.price,
+  // other necessary fields...
+});
+```
+
+Or define a **factory function** that returns a plain object:
+
+````ts
+function createBasketItem(product, quantity) {
+  return {
+    productId: product.id,
+    name: product.name,
+    quantity,
+    price: product.price,
+  };
+}
+
+// Then use it
+draft.items.push(createBasketItem(product, quantity));
+
 ---
 
 # Angular
@@ -490,7 +543,7 @@ This [link](https://angular.dev/reference/versions) tell which node is compatibl
 
 ```shell
 npm install -g @angular/cli
-```
+````
 
 If you get error like this `Error: error:0308010C:digital envelope routines::unsupported` while running `ng serve` add this environment variable
 
