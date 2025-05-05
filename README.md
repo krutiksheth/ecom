@@ -310,10 +310,93 @@ createRoot(document.getElementById('root')!).render(
 
 ```js
 const customBaseQuery = fetchBaseQuery({
-    baseUrl: "https://localhost:5001/api",
-    credentials:"include",
+  baseUrl: "https://localhost:5001/api",
+  credentials: "include",
 });
 ```
+
+# 🛒 Basket API with RTK Query (How to deactivate Caching simple way)
+
+## 📁 File: `basketApi.ts`
+
+```ts
+export const basketApi = createApi({
+  reducerPath: "basketApi",
+  baseQuery: baseQueryWithErrorHandling,
+  tagTypes: ["Basket"], // 👈 Tag type used for cache management
+  endpoints: (builder) => ({
+    fetchBasket: builder.query<Basket, void>({
+      query: () => ({ url: "basket" }),
+      providesTags: ["Basket"], // 👈 Caches this query result with tag "Basket"
+    }),
+    addBasketItem: builder.mutation<
+      Basket,
+      { productId: number; quantity: number }
+    >({
+      query: ({ productId, quantity }) => ({
+        url: `basket?productId=${productId}&&quantity=${quantity}`,
+        method: "POST",
+      }),
+      onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
+        try {
+          await queryFulfilled;
+          dispatch(basketApi.util.invalidateTags(["Basket"])); // 👈 Triggers refetch of fetchBasket
+        } catch (error) {
+          console.error(error);
+        }
+      },
+    }),
+    removeBasketItem: builder.mutation<
+      void,
+      { productId: number; quantity: number }
+    >({
+      query: ({ productId, quantity }) => ({
+        url: `basket?productId=${productId}&&quantity=${quantity}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Basket"], // 👈 Automatically refetches queries tagged with "Basket"
+    }),
+  }),
+});
+```
+
+## 🧠 Explanation
+
+### 🔖 `tagTypes`
+
+```ts
+tagTypes: ["Basket"];
+```
+
+Defines the logical tag used to identify cached data. This must be registered at the root of the API.
+
+### 🏷️ `providesTags`
+
+```ts
+providesTags: ["Basket"];
+```
+
+Used on **queries** to label their cached data with the specified tag (`'Basket'`).
+
+### ❌ `invalidateTags`
+
+```ts
+invalidateTags: ["Basket"];
+```
+
+Used on **mutations** to notify RTK Query that any data previously tagged with `'Basket'` should be re-fetched.
+
+Alternatively, for advanced scenarios, you can use `onQueryStarted` to call:
+
+```ts
+dispatch(basketApi.util.invalidateTags(["Basket"]));
+```
+
+## ✅ Example Flow
+
+1. `fetchBasket` runs and caches the response with tag `'Basket'`.
+2. `addBasketItem` succeeds and invalidates `'Basket'`.
+3. RTK Query automatically re-runs `fetchBasket` to get updated data.
 
 ---
 
