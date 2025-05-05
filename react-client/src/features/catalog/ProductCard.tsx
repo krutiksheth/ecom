@@ -32,7 +32,7 @@ const ProductCard = ({product}: Props) => {
             </CardContent>
             <CardActions sx={{justifyContent: "space-between"}}>
                 <Button disabled={isLoading} variant="text" onClick={() =>
-                    addBasketItem({productId: product.id, quantity: 1})}>Add to cart</Button>
+                    addBasketItem({product: product, quantity: 1})}>Add to cart</Button>
                 <Button component={Link} to={`/catalog/${product.id}`} variant="text">View</Button>
             </CardActions>
         </Card>

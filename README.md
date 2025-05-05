@@ -398,6 +398,88 @@ dispatch(basketApi.util.invalidateTags(["Basket"]));
 2. `addBasketItem` succeeds and invalidates `'Basket'`.
 3. RTK Query automatically re-runs `fetchBasket` to get updated data.
 
+# 🛒 Optimistic Update in RTK Query — `addBasketItem` Example
+
+This document explains how the `addBasketItem` mutation uses an **optimistic update** strategy in a Redux Toolkit Query setup for a shopping basket.
+
+
+## 📌 What is an Optimistic Update?
+
+An **optimistic update** updates the UI **before** the server confirms the change. If the server request fails, the UI state is **rolled back**.
+
+✅ Pros: Faster and smoother user experience.  
+❌ Cons: Requires rollback handling in case of failure.
+
+
+## 🔧 Mutation Definition
+
+```ts
+addBasketItem: builder.mutation<Basket, { product: Product, quantity: number }>({{
+  query: ({ product, quantity }) => ({
+    url: `basket?productId=${product.id}&&quantity=${quantity}`,
+    method: "POST",
+  }),
+  onQueryStarted: async ({ product, quantity }, { dispatch, queryFulfilled }) => {
+    const patchResult = dispatch(
+      basketApi.util.updateQueryData("fetchBasket", undefined, (draft) => {
+        const existingItem = draft.items.find(item => item.productId === product.id);
+        if (existingItem) {
+          existingItem.quantity += quantity;
+        } else {
+          draft.items.push(new Item(product, quantity));
+        }
+      })
+    );
+
+    try {
+      await queryFulfilled;
+      dispatch(basketApi.util.invalidateTags(["Basket"]));
+    } catch (error) {
+      console.log(error);
+      patchResult.undo();
+    }
+  }
+})
+```
+
+
+## 🧠 Step-by-Step Explanation
+
+### 1. 🖌️ Optimistically Update the UI
+
+```ts
+basketApi.util.updateQueryData("fetchBasket", undefined, (draft) => {
+  // Modify cached data immediately
+})
+```
+
+- Updates the local cache before waiting for server confirmation.
+- Creates a more responsive experience for the user.
+
+### 2. ⏳ Await Real Server Response
+
+```ts
+await queryFulfilled;
+```
+
+- Waits for the actual result of the POST request.
+
+### 3. ♻️ Invalidate Tag (Optional)
+
+```ts
+dispatch(basketApi.util.invalidateTags(["Basket"]));
+```
+
+- Ensures that the data is refetched if needed (optional for extra safety).
+
+### 4. ❌ Rollback on Error
+
+```ts
+patchResult.undo();
+```
+
+- If the server call fails, this reverts the UI to its previous state.
+
 ---
 
 # Angular
