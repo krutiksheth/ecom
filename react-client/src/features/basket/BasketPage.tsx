@@ -1,5 +1,6 @@
 ﻿import {useFetchBasketQuery} from "./basketApi.ts";
-import {Typography} from "@mui/material";
+import {Grid2, Typography} from "@mui/material";
+import BasketItem from "./BasketItem.tsx";
 
 const BasketPage = () => {
 
@@ -10,9 +11,15 @@ const BasketPage = () => {
     if(!basket) return <Typography variant="h3">Your basket is empty</Typography>;
     
     return (
-        <div>
-            {basket.basketId}
-        </div>
+        <Grid2 spacing={2} container>
+           <Grid2 size={8}>
+               {basket.items.map((item) => (
+                   <BasketItem 
+                       item={item} 
+                       key={item.productId}></BasketItem>
+               ))}
+           </Grid2>
+        </Grid2>
     );
 };
 

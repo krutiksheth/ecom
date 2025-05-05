@@ -1,10 +1,10 @@
 ﻿export type Basket ={
     id: number
     basketId: string
-    items: BasketItem[]
+    items: item[]
 }
 
-export type BasketItem ={
+export type item ={
     productId: number
     name: string
     price: number
