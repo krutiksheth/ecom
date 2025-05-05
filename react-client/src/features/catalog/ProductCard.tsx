@@ -2,6 +2,7 @@
 import {Button, Card, CardActions, CardContent, CardMedia, Typography} from "@mui/material";
 import {Link} from "react-router-dom";
 import {useAddBasketItemMutation} from "../basket/basketApi.ts";
+import {currencyFormat} from "../../lib/util.ts";
 
 type Props = {
     product: Product;
@@ -27,7 +28,7 @@ const ProductCard = ({product}: Props) => {
                 <Typography variant="subtitle2" gutterBottom
                             sx={{textTransform: "uppercase"}}>{product.name}</Typography>
                 <Typography variant="h6" gutterBottom sx={{color: 'secondary.main'}}>
-                    ${(product.price / 100).toFixed(2)}
+                    {currencyFormat(product.price)}
                 </Typography>
             </CardContent>
             <CardActions sx={{justifyContent: "space-between"}}>

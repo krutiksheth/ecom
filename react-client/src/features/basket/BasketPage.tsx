@@ -1,6 +1,7 @@
 ﻿import {useFetchBasketQuery} from "./basketApi.ts";
 import {Grid2, Typography} from "@mui/material";
 import BasketItem from "./BasketItem.tsx";
+import OrderSummary from "../../app/shared/OrderSummary.tsx";
 
 const BasketPage = () => {
 
@@ -19,6 +20,9 @@ const BasketPage = () => {
                        key={item.productId}></BasketItem>
                ))}
            </Grid2>
+            <Grid2 size={4}>
+                <OrderSummary />
+            </Grid2>
         </Grid2>
     );
 };

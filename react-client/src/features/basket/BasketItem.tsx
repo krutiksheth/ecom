@@ -8,10 +8,10 @@ type Props = {
     item: item
 }
 const BasketItem = ({item}: Props) => {
-    
+
     const [removeBasketItem] = useRemoveBasketItemMutation();
     const [addBasketItem] = useAddBasketItemMutation();
-    
+
     return (
         <Paper sx={{
             height: 140,
@@ -39,7 +39,8 @@ const BasketItem = ({item}: Props) => {
                     <Box display="flex" alignItems="center" gap={3}>
                         <Typography
                             sx={{fontSize: "1.1rem"}}>{currencyFormat(item.price)} x {item.quantity}</Typography>
-                        <Typography sx={{fontSize: "1.1rem"}}>${(item.price / 100) * item.quantity}</Typography>
+                        <Typography color="primary"
+                                    sx={{fontSize: "1.1rem"}}>{currencyFormat(item.price * item.quantity)}</Typography>
                     </Box>
                     <Grid2 container spacing={1} alignItems="center">
                         <IconButton onClick={() => removeBasketItem({
