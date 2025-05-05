@@ -532,6 +532,7 @@ function createBasketItem(product, quantity) {
 
 // Then use it
 draft.items.push(createBasketItem(product, quantity));
+```
 
 ---
 
