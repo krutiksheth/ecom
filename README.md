@@ -40,6 +40,12 @@ dotnet tool install --global dotnet-ef --version 9.0.0
 dotnet tool list -g
 ```
 
+## In order to send cookie with request make sure in `program.cs` file you should have `AllowCredentials()` set in `UseCors and make sure `AllowAnyOrigin`is replaced with`WithOrigins`
+
+```#
+pp.UseCors(options => options.WithOrigins("https://localhost:3000","https://localhost:4200").AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+```
+
 ---
 
 # React
@@ -299,6 +305,15 @@ createRoot(document.getElementById('root')!).render(
 ## If you are using axios for making api call this is how you can use interceptors for configuring different error
 
 (Axios Interceptors)[https://github.com/TryCatchLearn/Restore/blob/main/client/src/app/api/agent.ts]
+
+## If you want to include cookies in react client in React Query make sure to inculde `credentials:"include"` in `baseQueyApi`
+
+```js
+const customBaseQuery = fetchBaseQuery({
+    baseUrl: "https://localhost:5001/api",
+    credentials:"include",
+});
+```
 
 ---
 

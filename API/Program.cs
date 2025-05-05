@@ -35,7 +35,7 @@ var app = builder.Build();
 // Middleware (ordering is important)
 //
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseCors(options => options.WithOrigins("https://localhost:3000","https://localhost:4200").AllowAnyMethod().AllowCredentials().AllowAnyHeader());
 app.MapControllers();
 
 try
