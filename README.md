@@ -520,7 +520,7 @@ draft.items.push({
 
 Or define a **factory function** that returns a plain object:
 
-````ts
+```ts
 function createBasketItem(product, quantity) {
   return {
     productId: product.id,
