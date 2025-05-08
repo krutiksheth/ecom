@@ -25,6 +25,7 @@
 - Angular Language Service [Angular]
 - Tailwind CSS Intellisense [Tailwind]
 - Auto Rename Tag [Jun Han]
+- Redis [Dunn]
 
 ## Fix for certificate issue when running
 
