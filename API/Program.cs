@@ -1,5 +1,6 @@
 using API.Data;
 using API.Middleware;
+using API.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StackExchange.Redis;
@@ -37,6 +38,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
     
     return ConnectionMultiplexer.Connect(configuration);
 });
+builder.Services.AddSingleton<IBasketService, BasketService>();
 
 var app = builder.Build();
 
