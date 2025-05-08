@@ -2,6 +2,7 @@ using API.Data;
 using API.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using StackExchange.Redis;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -28,6 +29,14 @@ builder.Services.AddCors();
 // AddSingleton -> service will be instantiated when application starts and is disposed when application ends
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Redis");
+    if(string.IsNullOrEmpty(connectionString)) throw new Exception("Redis connection string is empty");
+    var configuration = ConfigurationOptions.Parse(connectionString, true);
+    
+    return ConnectionMultiplexer.Connect(configuration);
+});
 
 var app = builder.Build();
 

@@ -43,7 +43,42 @@ dotnet tool list -g
 ## In order to send cookie with request make sure in `program.cs` file you should have `AllowCredentials()` set in `UseCors and make sure `AllowAnyOrigin`is replaced with`WithOrigins`
 
 ```#
-pp.UseCors(options => options.WithOrigins("https://localhost:3000","https://localhost:4200").AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+app.UseCors(options => options.WithOrigins("https://localhost:3000","https://localhost:4200").AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+```
+
+## Setup Redis
+
+- Add following redis package in your project
+
+```
+StackExchange.Redis
+```
+
+- Now open `program.cs` file and configure this
+
+```C#
+...
+...
+builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("Redis");
+    if(string.IsNullOrEmpty(connectionString))
+      throw new Exception("Redis connection string is empty");
+    var configuration = ConfigurationOptions.Parse(connectionString, true);
+
+    return ConnectionMultiplexer.Connect(configuration);
+});
+```
+
+- Now define `Redis` in `appsettings.development.json`
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data source=store.db",
+    "Redis": "localhost"
+  }
+}
 ```
 
 ---
@@ -544,7 +579,7 @@ This [link](https://angular.dev/reference/versions) tell which node is compatibl
 
 ```shell
 npm install -g @angular/cli
-````
+```
 
 If you get error like this `Error: error:0308010C:digital envelope routines::unsupported` while running `ng serve` add this environment variable
 
