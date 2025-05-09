@@ -20,7 +20,7 @@ public class BasketController(
     {
         var basket = await FindBasket();
         
-        if (basket == null) return NotFound();
+        if (basket == null) return NoContent();
 
         return Ok(mapper.Map<BasketDto>(basket));
     }

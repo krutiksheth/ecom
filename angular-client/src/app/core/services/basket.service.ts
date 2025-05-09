@@ -1,4 +1,4 @@
-import {inject, Injectable, signal} from '@angular/core';
+import {computed, inject, Injectable, signal} from '@angular/core';
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Basket, Item} from "../../shared/models/basket";
@@ -13,6 +13,9 @@ export class BasketService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   basket = signal<Basket | null>(null);
+  itemCount = computed(() => {
+    return this.basket()?.items.reduce((sum, item) => sum + item.quantity, 0);
+  })
 
   httpOptions = {
     withCredentials: true
