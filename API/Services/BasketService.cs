@@ -40,11 +40,11 @@ public class BasketService(IConnectionMultiplexer redis) : IBasketService
 
         if (basket.Items.Count == 0)
         {
-           return await _database.KeyDeleteAsync(basket.BasketId);
+            return await _database.KeyDeleteAsync(basket.BasketId);
         }
         else
         {
-           return await _database.StringSetAsync(basket.BasketId,JsonSerializer.Serialize(basket), expiry);
+            return await _database.StringSetAsync(basket.BasketId,JsonSerializer.Serialize(basket), expiry);
         }
     }
 }
