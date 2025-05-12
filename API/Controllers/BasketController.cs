@@ -19,7 +19,7 @@ public class BasketController(
     public async Task<ActionResult<Basket>> GetBasket()
     {
         var basket = await FindBasket();
-        
+
         if (basket == null) return NoContent();
 
         return Ok(mapper.Map<BasketDto>(basket));
@@ -106,34 +106,34 @@ public class BasketController(
 
     #region "Redis"
 
-    // [HttpGet("{key}")]
-    // public async Task<ActionResult<Basket>> GetBasket(string key)
-    // {
-    //     var basket = await basketService.GetBasket(key);
-    //
-    //     return Ok(mapper.Map<BasketDto>(basket ?? new Basket { BasketId = key }));
-    // }
-    //
-    // [HttpPost]
-    // public async Task<ActionResult<Basket>> UpdateBasket(Basket basket)
-    // {
-    //     var updatedBasket = await basketService.AddItemToBasket(basket);
-    //
-    //     if (updatedBasket == null)
-    //         return BadRequest("Problem adding item to Basket");
-    //
-    //     return Ok(mapper.Map<BasketDto>(updatedBasket));
-    // }
-    //
-    // [HttpDelete]
-    // public async Task<ActionResult<Basket>> DeleteBasket(string id)
-    // {
-    //     var result = await basketService.RemoveItemFromBasket(id);
-    //
-    //     if (!result) return BadRequest("Problem removing item from Basket");
-    //
-    //     return Ok();
-    // }
+    [HttpGet]
+    public async Task<ActionResult<Basket>> GetBasket(string key)
+    {
+        var basket = await basketService.GetBasket(key);
+
+        return Ok(mapper.Map<BasketDto>(basket ?? new Basket { BasketId = key }));
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<Basket>> UpdateBasket(Basket basket)
+    {
+        var updatedBasket = await basketService.AddItemToBasket(basket);
+
+        if (updatedBasket == null)
+            return BadRequest("Problem adding item to Basket");
+
+        return Ok(mapper.Map<BasketDto>(updatedBasket));
+    }
+
+    [HttpDelete]
+    public async Task<ActionResult<Basket>> DeleteBasket(string id)
+    {
+        var result = await basketService.RemoveItemFromBasket(id);
+
+        if (!result) return BadRequest("Problem removing item from Basket");
+
+        return Ok();
+    }
 
     #endregion
 }
