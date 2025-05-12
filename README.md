@@ -885,3 +885,49 @@ constructor(private router: Router){
   }
 
 ```
+
+## To generate environments
+
+```
+ng g environments
+```
+
+## Generate a random id using this package
+
+```
+npm i nanoid
+```
+
+# Angular Signals (use for state management similar to redux state management)
+
+- State that can be observed and reacted to
+- Clean API for state management
+- Avoid the complexity of observables
+
+## Pros
+
+- Simplicity
+- Performance
+- Readability
+
+## Cons
+
+- Limited Flexibility good for synchronous operation not recommended for asynchronous operation
+- Scalability (useful to simpler case not suited for complex data flows and actions)
+
+## How to use Signal, Computed and Effect Type
+
+- Signal
+
+```js
+const count = signal(0);
+
+//Signals are getter function - calling them to read their value
+console.log("The count is" + count());
+
+//Set value
+count.set(3);
+
+//Update value
+count.update((value) => value + 2);
+```
