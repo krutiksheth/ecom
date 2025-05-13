@@ -931,3 +931,5 @@ count.set(3);
 //Update value
 count.update((value) => value + 2);
 ```
+
+## Two way binding for form input `[(ngModel)]="<propertyname>"` imported from `FormsModule`

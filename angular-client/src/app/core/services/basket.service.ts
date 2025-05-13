@@ -15,7 +15,7 @@ export class BasketService {
     private http = inject(HttpClient);
     basket = signal<Basket | null>(null);
     cookieService = inject(CookieService);
-
+    basketCookieName ="BasketId";
     itemCount = computed(() => {
         return this.basket()?.items.reduce((sum, item) => sum + item.quantity, 0);
     });
@@ -84,11 +84,11 @@ export class BasketService {
         this.basket.set(basket);
 
         return this.http.delete(this.baseUrl + `basket?productId=${productId}&&quantity=${quantity}`, this.httpOptions).subscribe({
-            // next:()=>{
-            //     if(basket.items.length ===0){
-            //         this.cookieService.delete("BasketId");
-            //     }
-            // },
+            next:()=>{
+                if(basket.items.length ===0){
+                    this.cookieService.delete(this.basketCookieName);
+                }
+            },
             error: () => this.basket.set(current),
         });
     }
