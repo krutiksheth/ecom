@@ -1,6 +1,8 @@
 using API.Data;
+using API.Entities;
 using API.Middleware;
 using API.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StackExchange.Redis;
@@ -33,12 +35,15 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 {
     var connectionString = builder.Configuration.GetConnectionString("Redis");
-    if(string.IsNullOrEmpty(connectionString)) throw new Exception("Redis connection string is empty");
+    if (string.IsNullOrEmpty(connectionString)) throw new Exception("Redis connection string is empty");
     var configuration = ConfigurationOptions.Parse(connectionString, true);
-    
+
     return ConnectionMultiplexer.Connect(configuration);
 });
 builder.Services.AddSingleton<IBasketService, BasketService>();
+builder.Services.AddIdentityApiEndpoints<User>(opt => { opt.User.RequireUniqueEmail = true; })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<StoreContext>();
 
 var app = builder.Build();
 
@@ -46,8 +51,15 @@ var app = builder.Build();
 // Middleware (ordering is important)
 //
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(options => options.WithOrigins("https://localhost:3000","https://localhost:4200").AllowAnyMethod().AllowCredentials().AllowAnyHeader());
+app.UseCors(options => options.WithOrigins("https://localhost:3000", "https://localhost:4200").AllowAnyMethod()
+    .AllowCredentials().AllowAnyHeader());
+
+//order is important
+app.UseAuthentication();
+app.UseAuthorization();
+//
 app.MapControllers();
+app.MapGroup("api").MapIdentityApi<User>();
 
 try
 {

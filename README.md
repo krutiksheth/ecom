@@ -113,6 +113,34 @@ public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(op
 }
 ```
 
+- Now configure `Program.cs` file
+
+```C#
+builder.Services.AddIdentityApiEndpoints<User>(opt => { opt.User.RequireUniqueEmail = true; })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<StoreContext>();
+
+var app = builder.Build();
+..
+..
+//order is important
+app.UseAuthentication();
+app.UseAuthorization();
+//
+
+..
+..
+app.MapGroup("api").MapIdentityApi<User>();
+
+```
+
+- Now stop your running application and run this command
+
+```sh
+dotnet ef migrations add IdentityAdded
+dotnet ef database update
+```
+
 ---
 
 # React
