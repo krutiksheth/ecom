@@ -82,6 +82,37 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 }
 ```
 
+## Setup dotnet identity
+
+- ![Pros and Cons](./react-client/public/images/pros-and-cons-identity.png)
+- We are using ![Cookie based authentication](./react-client/public/images/cookie-based-authentication.png)
+- ![Identity Endpoints](./react-client/public/images/dotnet-identity-endpoints.png)
+
+## Identity Configuration in project
+
+- Install nuget package
+
+```sh
+dotnet tool install Microsoft.AspNetCore.Identity.EntityFrameworkCore
+```
+
+- Create a class called `USer` and derive it from `IdentityUser`
+
+```C#
+public class User : IdentityUser
+{
+
+}
+```
+
+- Now edit your DbContext class `StoreContext` and derived from `IdentityDbContext`
+
+```c#
+public class StoreContext(DbContextOptions options) : IdentityDbContext<User>(options){
+
+}
+```
+
 ---
 
 # React
