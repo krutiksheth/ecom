@@ -25,11 +25,10 @@ export default function UserMenu({user}: Props) {
     return (
         <div>
             <Button
-                id="fade-button"
-                aria-controls={open ? 'fade-menu' : undefined}
-                aria-haspopup="true"
-                aria-expanded={open ? 'true' : undefined}
+                color="inherit"
                 onClick={handleClick}
+                size="large"
+                sx={{fontSize:"1.1rem"}}
             >
                 {user.email}
             </Button>
