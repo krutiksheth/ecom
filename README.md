@@ -317,6 +317,63 @@ In `ServerError.tsx` file you can retrieve state data this way:
 const { state } = useLocation();
 ```
 
+## Add Router Guard
+
+In order to implement that create a `RequireAuth.ts` file with following code and add logic there to guard your routes
+
+```js
+import { useUserInfoQuery } from "../../features/account/accountApi";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+
+const RequireAuth = () => {
+  const { data: user, isLoading } = useUserInfoQuery();
+  const location = useLocation();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to={"/login"} state={{ from: location }}></Navigate>;
+  }
+
+  return <Outlet />;
+};
+
+export default RequireAuth;
+```
+
+Now modify your route file to handle protected routes in the following way:
+
+```js
+export const router = createBrowserRouter([
+  {
+    path: "/", // route route
+    element: <App />, // specify app component here
+    children: [
+      {
+        element: <RequireAuth />,
+        children: [
+          { path: "checkout", element: <CheckoutPage /> }, // specify contact component
+        ],
+      },
+      { path: "", element: <HomePage /> }, // specify home component
+      { path: "catalog", element: <Catalog /> }, // specify catalog component
+      { path: "catalog/:id", element: <ProductDetails /> }, // specify product details component
+      { path: "about", element: <AboutPage /> }, // specify about component
+      { path: "contact", element: <ContactPage /> }, // specify contact component
+      { path: "basket", element: <BasketPage /> }, // specify contact component
+
+      { path: "login", element: <LoginForm /> }, // specify contact component
+      { path: "register", element: <RegisterForm /> }, // specify contact component
+      { path: "server-error", element: <ServerError /> }, // specify server-error component
+      { path: "not-found", element: <NotFound /> }, // specify not-found component
+      { path: "*", element: <Navigate replace to="/not-found"></Navigate> }, // specify wildcard
+    ],
+  },
+]);
+```
+
 ## Store for Global Statemanagement
 
 - What is redux?
@@ -628,6 +685,149 @@ function createBasketItem(product, quantity) {
 // Then use it
 draft.items.push(createBasketItem(product, quantity));
 ```
+
+## 📝 Note on Using registerUser Mutation
+
+When calling the registerUser mutation (or any RTK Query mutation with createApi), make sure to use .unwrap() to properly handle success and error cases with try/catch.
+
+✅ Correct Usage (Recommended):
+
+````js
+try {
+  const result = await registerUser(data).unwrap();
+  // Handle success (e.g., show success toast, redirect, etc.)
+} catch (error) {
+  // Handle error (e.g., show error toast, display validation messages, etc.)
+}```
+
+##❌ Incorrect Usage (Will NOT catch exceptions properly):
+
+```js
+const result = await registerUser(data); // ❌ error will not be caught in try/catch
+````
+
+## Why .unwrap() is Important
+
+RTK Query returns a Promise that resolves to a result object unless you call .unwrap().
+
+Using .unwrap() transforms the result into a standard try/catch-friendly Promise, allowing you to:
+
+Catch errors in a catch block.
+
+Avoid manually checking .error and .data fields.
+
+🔒 Always use .unwrap() with await inside try/catch to ensure proper exception handling.
+
+# ✅ React Hook Form with Zod Validation
+
+This guide demonstrates how to build a type-safe login form using **React Hook Form** and **Zod**. It covers both standard validation and schema-based validation using the `zodResolver`.
+
+## 📦 Installation
+
+Install React Hook Form and Zod:
+
+```bash
+npm install react-hook-form
+npm install zod @hookform/resolvers
+```
+
+## 🧩 Define Your Validation Schema
+
+Create the schema in `schemas/loginSchema.ts`:
+
+```ts
+import { z } from "zod";
+
+export const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters",
+  }),
+});
+
+// Auto-generate the form type from the schema
+export type LoginSchema = z.infer<typeof loginSchema>;
+```
+
+## 🔌 React Hook Form Usage
+
+### 🔹 Without Schema Validation
+
+If you are not using Zod, just define the form like this:
+
+```tsx
+import { useForm } from "react-hook-form";
+import { TextField } from "@mui/material";
+
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm<LoginSchema>();
+
+<TextField
+  {...register("email")}
+  error={!!errors.email}
+  helperText={errors.email?.message}
+  label="Email"
+  fullWidth
+/>;
+```
+
+### 🔹 With Zod Validation
+
+Use `zodResolver` to connect the schema to the form:
+
+```tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginSchema } from "./schemas/loginSchema";
+import { TextField } from "@mui/material";
+
+const {
+  register,
+  handleSubmit,
+  formState: { errors },
+} = useForm<LoginSchema>({
+  mode: "onTouched",
+  resolver: zodResolver(loginSchema),
+});
+
+const onSubmit = (data: LoginSchema) => {
+  console.log("Submitted Data:", data);
+};
+
+<form onSubmit={handleSubmit(onSubmit)}>
+  <TextField
+    {...register("email")}
+    error={!!errors.email}
+    helperText={errors.email?.message}
+    fullWidth
+    label="Email"
+  />
+  <TextField
+    {...register("password")}
+    error={!!errors.password}
+    helperText={errors.password?.message}
+    fullWidth
+    label="Password"
+    type="password"
+  />
+  <button type="submit">Login</button>
+</form>;
+```
+
+## 🧠 Why Use Zod?
+
+- ✅ Type-safe schema validation
+- 🧼 Cleaner and centralized validation logic
+- ♻️ Reusable across components and APIs
+
+## 🔗 Useful Links
+
+- [React Hook Form Docs](https://react-hook-form.com/)
+- [Zod Documentation](https://zod.dev/)
+- [@hookform/resolvers GitHub](https://github.com/react-hook-form/resolvers)
 
 ---
 

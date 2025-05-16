@@ -4,6 +4,8 @@ import {Link, NavLink} from "react-router-dom";
 import {useAppDispatch, useAppSelector} from "../store/store.ts";
 import {setDarkMode} from "./uiSlice.ts";
 import {useFetchBasketQuery} from "../../features/basket/basketApi.ts";
+import UserMenu from "./UserMenu.tsx";
+import {useUserInfoQuery} from "../../features/account/accountApi.ts";
 
 const midLinks = [
     {title: "catalog", path: "/catalog"},
@@ -29,7 +31,7 @@ const navStyles = {
 }
 
 const NavBar = () => {
-
+    const {data: user} = useUserInfoQuery();
     const {isLoading, darkMode} = useAppSelector(state => state.ui);
     const dispatch = useAppDispatch();
     const {data: basket} = useFetchBasketQuery();// <-- since we are caching this won't trigger fetch and grab data
@@ -57,12 +59,16 @@ const NavBar = () => {
                             <ShoppingCart/>
                         </Badge>
                     </IconButton>
-                    <List sx={{display: "flex"}}>
-                        {rightLinks.map(({title, path}) => (
-                            <ListItem sx={navStyles} component={NavLink} to={path}
-                                      key={path}>{title.toUpperCase()}</ListItem>
-                        ))}
-                    </List>
+                    {user ? 
+                        (<UserMenu user={user} />):
+                            ( <List sx={{display: "flex"}}>
+                                {rightLinks.map(({title, path}) => (
+                                    <ListItem sx={navStyles} component={NavLink} to={path}
+                                              key={path}>{title.toUpperCase()}</ListItem>
+                                ))}
+                            </List>)
+                        }
+                   
                 </Box>
             </Toolbar>
             {isLoading && (<Box sx={{width: "100%"}}><LinearProgress color="secondary"/></Box>)}
