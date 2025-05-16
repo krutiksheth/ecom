@@ -1,8 +1,9 @@
-import {Box, Button, Paper, TextField} from "@mui/material";
+import {Box, Button, Paper} from "@mui/material";
 import RadioButtonGroup from "../../app/shared/RadioButtonGroup.tsx";
 import {useAppDispatch, useAppSelector} from "../../app/store/store.ts";
 import {reset, setBrands, setOrderBy, setTypes} from "./catalogSlice.ts";
 import CheckboxButtons from "../../app/shared/CheckboxButtons.tsx";
+import Search from "./Search.tsx";
 
 const sortOptions = [
     { value: 'name', label: 'Alphabetical' },
@@ -23,7 +24,7 @@ const Filters = ({filtersData: data}: Props) => {
     return (
         <Box display="flex" flexDirection="column" gap={3}>
             <Paper>
-                <TextField label="Search Products" variant="outlined" fullWidth></TextField>
+                <Search></Search>
             </Paper>
             <Paper sx={{p:3}}>
                 <RadioButtonGroup options={sortOptions} 
