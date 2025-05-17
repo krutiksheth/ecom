@@ -13,8 +13,13 @@
       <a routerLink="/basket" routerLinkActive="active" matBadge="{{basketService.itemCount()}}" matBadgeSize="large" class="custom-badge mt-2 mr-2">
         <mat-icon>shopping_cart</mat-icon>
       </a>
-      <button routerLink="/login" routerLinkActive="active" mat-stroked-button>Login</button>
-      <button routerLink="/register" routerLinkActive="active" mat-stroked-button>Register</button>
+      @if(accountService.currentUser()){
+        <button mat-stroked-button (click)="logout()">Logout</button>
+      }
+      @else{
+        <button routerLink="/login" routerLinkActive="active" mat-stroked-button>Login</button>
+        <button routerLink="/register" routerLinkActive="active" mat-stroked-button>Register</button>
+      }
     </div>
   </div>
 </header>

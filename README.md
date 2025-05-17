@@ -997,6 +997,61 @@ Angular supports two-way bindings `[]` represents `input` and `()` represents `o
 - FormGroup
 - FormArray
 
+### How to use reactive form module
+
+- First import `ReactiveFormModule` in `LoginComponent` and define `loginForm`
+
+```js
+@Component({
+  selector: "app-login",
+  standalone: true,
+  imports: [
+    ReactiveFormsModule, // <-- imported here
+  ],
+  templateUrl: "./login.component.html",
+  styleUrl: "./login.component.scss",
+})
+export class LoginComponent {
+   private fb= inject(FormBuilder);
+    private accountService= inject(AccountService);
+    private router = inject(Router);
+
+    loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+    })
+
+ onSubmit(){
+    console.log(this.loginForm.value);
+ }
+
+}
+```
+
+- In html code you need to use `[formGroup]` and `(ngSubmit)` make sure to use `formControlName` in `Input`
+
+```html
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <input
+    formControlName="email"
+    type="email"
+    placeholder="name@example.com"
+    matInput
+  />
+  <input
+    formControlName="password"
+    type="password"
+    placeholder="Password"
+    matInput
+  />
+  <button mat-flat-button type="submit" class="w-full py-2">Sign in</button>
+</form>
+```
+
+- Note make sure you have this configured in http service `WithCredential: true` otherwise you wont get cookie
+
+### In order to return multiple observable and wait for them we use `forkJoin` look at `InitService` code
+
 ## Setup Angular Routing
 
 First create different component using this command in the terminal

@@ -1,6 +1,7 @@
 import {inject, Injectable} from '@angular/core';
 import {BasketService} from "./basket.service";
-import {of} from "rxjs";
+import {forkJoin, of} from "rxjs";
+import {AccountService} from "./account.service";
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +9,14 @@ import {of} from "rxjs";
 export class InitService {
 
   private basketService = inject(BasketService);
+  private accountService = inject(AccountService);
 
   init(){
-    return this.basketService.getBasket()?? of(null);
+    const basket$ = this.basketService.getBasket()?? of(null);
+
+    return forkJoin({
+      basket: basket$,
+      user: this.accountService.getUserInfo(),
+    });
   }
 }
