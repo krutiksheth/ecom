@@ -973,7 +973,7 @@ Angular supports two-way bindings `[]` represents `input` and `()` represents `o
 
 - More flexible, but needs a lot of practice
 - Handles any complex scenarios
-- No data binding is done (immutable data model preferred by most developers)
+- No data binding is done (immutable data model preferred by most developers) and it uses observables
 - More component code and less HTML markup
 - Reactive transformations can be made possible such as:
 - Handling an event based on a debounce time
@@ -990,6 +990,12 @@ Angular supports two-way bindings `[]` represents `input` and `()` represents `o
 - Minimal component code
 - Automatic track of the form and its data(handled by Angular)
 - Unit testing is another challenge
+
+### Building Block of Reactive Forms
+
+- FormControl
+- FormGroup
+- FormArray
 
 ## Setup Angular Routing
 
