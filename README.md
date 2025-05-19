@@ -1413,3 +1413,133 @@ export class RegisterComponent {
 - `@Input()` to pass dynamic values from parent
 - `@Self()` to inject the current form control only
 - `ControlValueAccessor` to integrate custom components with Angular Forms
+
+## AuthGuard Implementation
+
+### What is an AuthGuard?
+
+An **AuthGuard** is used to protect specific routes in the application, ensuring that only authenticated users can access them. It checks the user's authentication status before allowing access to protected routes.
+
+---
+
+### Changes Made
+
+1. **Created the AuthGuard**  
+   The `AuthGuard` checks if the user is authenticated. If not, it redirects them to the login page.
+
+2. **Updated Routing**  
+   Routes requiring authentication were updated to include the `AuthGuard`.
+
+3. **Account Service Updates**  
+   Added a method to check if the user is logged in by verifying the presence of a valid token.
+
+4. **Return URL Handling**  
+   To improve user experience, the `AuthGuard` now captures the `returnUrl` (the URL the user was trying to access) and passes it to the login page. After successful login, the user is redirected back to the original URL.
+
+5. **Modified AuthGuard to Use Observables**  
+   The `AuthGuard` was updated to use observables instead of synchronous checks. This change was made to handle asynchronous operations, such as fetching user authentication status from an API or a state management store.
+
+---
+
+### Why Use Observables in AuthGuard?
+
+Using observables in the `AuthGuard` allows us to handle asynchronous operations, such as:
+
+- **Fetching User Authentication Status:** If the authentication status is stored on the server or in a state management store, it may require an API call or subscription to a state change.
+- **Real-Time Updates:** Observables enable real-time updates to the authentication status, ensuring the guard always has the latest information.
+- **Improved Flexibility:** Observables provide a more flexible and reactive approach to handling authentication logic compared to synchronous methods.
+
+---
+
+### Updated AuthGuard Code
+
+```typescript
+import { Injectable } from "@angular/core";
+import {
+  CanActivate,
+  Router,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from "@angular/router";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { AccountService } from "../services/account.service";
+
+@Injectable({
+  providedIn: "root",
+})
+export class AuthGuard implements CanActivate {
+  constructor(private accountService: AccountService, private router: Router) {}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> {
+    return this.accountService.isLoggedIn().pipe(
+      map((isAuthenticated) => {
+        if (isAuthenticated) {
+          return true;
+        } else {
+          this.router.navigate(["/login"], {
+            queryParams: { returnUrl: state.url },
+          });
+          return false;
+        }
+      })
+    );
+  }
+}
+```
+
+---
+
+### How to Use
+
+- Add `canActivate: [AuthGuard]` to any route you want to protect in the routing configuration.
+- Ensure the `AccountService` provides an observable for the authentication status.
+
+---
+
+### Example
+
+**Routing Configuration:**
+
+```typescript
+import { Routes } from "@angular/router";
+import { AuthGuard } from "./core/guards/auth.guard";
+
+export const routes: Routes = [
+  { path: "", component: HomeComponent },
+  { path: "shop", component: ShopComponent },
+  { path: "checkout", component: CheckoutComponent, canActivate: [AuthGuard] }, // Protected route
+  { path: "**", redirectTo: "", pathMatch: "full" },
+];
+```
+
+---
+
+### Testing
+
+- **Scenario 1:** Accessing a protected route while logged in:
+  - Expected Result: The user is allowed to access the route.
+- **Scenario 2:** Accessing a protected route without being logged in:
+  - Expected Result: The user is redirected to the login page with the `returnUrl` query parameter.
+- **Scenario 3:** Logging in after being redirected:
+  - Expected Result: The user is redirected back to the original URL.
+
+---
+
+### Summary
+
+✅ This setup helps you:
+
+- Protect sensitive routes with authentication.
+- Redirect users to the login page if they are not authenticated.
+- Automatically return users to their intended page after login.
+- Handle asynchronous authentication checks using observables.
+
+🧩 **Key Angular Concepts Used:**
+
+- `CanActivate` to guard routes.
+- `ActivatedRouteSnapshot` and `RouterStateSnapshot` to capture the current route.
+- Observables and RxJS operators (`map`) for asynchronous authentication handling.

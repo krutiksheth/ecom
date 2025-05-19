@@ -15,17 +15,14 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
         var user = new User
         {
             UserName = registerDto.Email,
-            Email = registerDto.Email,
+            Email = registerDto.Email
         };
 
         var result = await signInManager.UserManager.CreateAsync(user, registerDto.Password);
 
         if (!result.Succeeded)
         {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(error.Code, error.Description);
-            }
+            foreach (var error in result.Errors) ModelState.AddModelError(error.Code, error.Description);
 
             return ValidationProblem();
         }
@@ -38,10 +35,7 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
     [HttpGet("user-info")]
     public async Task<ActionResult> GetUserInfo()
     {
-        if (User.Identity.IsAuthenticated == false)
-        {
-            return NoContent();
-        }
+        if (User.Identity.IsAuthenticated == false) return NoContent();
 
         var user = await signInManager.UserManager.GetUserAsync(User);
 
@@ -53,7 +47,7 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
         {
             user.Email,
             user.UserName,
-            Roles = roles,
+            Roles = roles
         });
     }
 
@@ -77,10 +71,7 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
         user.Address = address;
         var result = await signInManager.UserManager.UpdateAsync(user);
 
-        if (!result.Succeeded)
-        {
-            return BadRequest("Problem updating address");
-        }
+        if (!result.Succeeded) return BadRequest("Problem updating address");
 
         return Ok(user.Address);
     }
@@ -96,5 +87,14 @@ public class AccountController(SignInManager<User> signInManager) : BaseApiContr
         if (address == null) return NoContent();
 
         return Ok(address);
+    }
+
+    [HttpGet("auth-status")]
+    public ActionResult GetAuthStatus()
+    {
+        return Ok(new
+        {
+            IsAuthenticated = User.Identity?.IsAuthenticated ?? false
+        });
     }
 }

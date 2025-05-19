@@ -10,20 +10,20 @@ import {map} from "rxjs";
 export class AccountService {
 
   baseUrl = environment.apiUrl;
+  currentUser = signal<User | null>(null);
   private http = inject(HttpClient);
-  currentUser= signal<User | null>(null);
 
-  login(login:any){
+  login(login: any) {
     let params = new HttpParams();
-    params= params.append('useCookies',true);
+    params = params.append('useCookies', true);
     return this.http.post<User>(`${this.baseUrl}login`, login, {params});
   }
 
-  register(register:any){
+  register(register: any) {
     return this.http.post(`${this.baseUrl}register`, register);
   }
 
-  getUserInfo(){
+  getUserInfo() {
     return this.http.get<User>(`${this.baseUrl}account/user-info`, {
       withCredentials: true
     }).pipe(
@@ -34,11 +34,15 @@ export class AccountService {
     );
   }
 
-  logout(){
+  logout() {
     return this.http.post(`${this.baseUrl}account/logout`, {});
   }
 
-  updateAddress(address:Address){
+  getAuthState() {
+    return this.http.get<{ isAuthenticated: boolean }>(`${this.baseUrl}account/auth-status`);
+  }
+
+  updateAddress(address: Address) {
     return this.http.post(`${this.baseUrl}account/address`, address, {});
   }
 }
