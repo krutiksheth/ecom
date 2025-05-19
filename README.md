@@ -1251,3 +1251,165 @@ count.set(3);
 //Update value
 count.update((value) => value + 2);
 ```
+
+# Angular Reusable Form Input with Material UI
+
+This guide demonstrates how to create a reusable text input component in Angular using `ControlValueAccessor` and Angular Material's `<mat-form-field>`. It allows consistent and reusable form inputs across your application with built-in validation error messages.
+
+## 🔧 Explanation of Key Concepts
+
+### `@Input()`
+
+The `@Input()` decorator in Angular allows a child component to receive data from its parent component.
+
+In `TextInputComponent`, these are defined:
+
+```ts
+@Input() label = "";
+@Input() type = "text";
+```
+
+- `label`: The text used for the input's placeholder and error label.
+- `type`: The type of the input element (`text`, `email`, `password`, etc.).
+
+### `@Self()`
+
+The `@Self()` decorator ensures Angular injects the `NgControl` from the current component’s element only (not from any ancestor elements).
+
+```ts
+constructor(@Self() public controlDir: NgControl) {
+  this.controlDir.valueAccessor = this;
+}
+```
+
+- `NgControl` allows this component to act as a bridge between the Angular form API and native form inputs.
+- Setting `valueAccessor` enables Angular to bind this component to a `FormControl`.
+
+Without `@Self()`, Angular might accidentally try to look for `NgControl` on parent elements, which could cause incorrect behavior or errors.
+
+## 1. Shared TextInputComponent
+
+### `text-input.component.ts`
+
+```ts
+import { Component, Input, Self } from "@angular/core";
+import { ControlValueAccessor, FormControl, NgControl } from "@angular/forms";
+
+@Component({
+  selector: "app-text-input",
+  templateUrl: "./text-input.component.html",
+})
+export class TextInputComponent implements ControlValueAccessor {
+  @Input() label = "";
+  @Input() type = "text";
+
+  constructor(@Self() public controlDir: NgControl) {
+    this.controlDir.valueAccessor = this;
+  }
+
+  get control(): FormControl {
+    return this.controlDir.control as FormControl;
+  }
+
+  writeValue(obj: any): void {}
+  registerOnChange(fn: any): void {}
+  registerOnTouched(fn: any): void {}
+}
+```
+
+### `text-input.component.html`
+
+```html
+<mat-form-field appearance="outline" class="w-full mb-4">
+  <mat-label>{{ label }}</mat-label>
+  <input [formControl]="control" matInput [placeholder]="label" [type]="type" />
+
+  @if (control.hasError('required')) {
+  <mat-error>{{ label }} is required</mat-error>
+  } @if (control.hasError('email')) {
+  <mat-error>Email is invalid</mat-error>
+  }
+</mat-form-field>
+```
+
+## 2. Using TextInputComponent in a Form
+
+### `register.component.html`
+
+```html
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <app-text-input
+    formControlName="firstName"
+    label="First Name"
+  ></app-text-input>
+  <app-text-input formControlName="lastName" label="Last Name"></app-text-input>
+  <app-text-input
+    formControlName="email"
+    label="Email"
+    type="email"
+  ></app-text-input>
+  <app-text-input
+    formControlName="password"
+    label="Password"
+    type="password"
+  ></app-text-input>
+  <button mat-raised-button color="primary" type="submit">Register</button>
+</form>
+```
+
+### `register.component.ts`
+
+```ts
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { AccountService } from "../services/account.service";
+import { SnackbarService } from "../services/snackbar.service";
+
+@Component({
+  selector: "app-register",
+  templateUrl: "./register.component.html",
+})
+export class RegisterComponent {
+  private fb = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  private router = inject(Router);
+  private snack = inject(SnackbarService);
+
+  passwordValidation = new RegExp(
+    /(?=^.{6,10}$)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+}{"':;?/>.<,])(?!.*\s).*$/
+  );
+
+  validationErrors?: string[];
+
+  registerForm = this.fb.group({
+    firstName: [null, Validators.required],
+    lastName: [null, Validators.required],
+    email: ["", [Validators.required, Validators.email]],
+    password: ["", Validators.required],
+  });
+
+  onSubmit() {
+    if (this.registerForm.valid) {
+      console.log(this.registerForm.value);
+      // call API here
+    } else {
+      this.snack.show("Please correct errors before submitting");
+    }
+  }
+}
+```
+
+## Summary
+
+✅ This setup helps you:
+
+- Reduce repeated form markup.
+- Provide consistent validation messages.
+- Improve form maintainability.
+
+🧩 **Key Angular Concepts Used:**
+
+- `@Input()` to pass dynamic values from parent
+- `@Self()` to inject the current form control only
+- `ControlValueAccessor` to integrate custom components with Angular Forms

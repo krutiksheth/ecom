@@ -7,6 +7,8 @@ import {BusyService} from "../../core/services/busy.service";
 import {MatProgressBar} from "@angular/material/progress-bar";
 import {BasketService} from "../../core/services/basket.service";
 import {AccountService} from "../../core/services/account.service";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'app-header',
@@ -17,7 +19,11 @@ import {AccountService} from "../../core/services/account.service";
     MatButton,
     RouterLink,
     RouterLinkActive,
-    MatProgressBar
+    MatProgressBar,
+    MatMenuTrigger,
+    MatMenu,
+    MatMenuItem,
+    MatDivider
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -28,9 +34,9 @@ export class HeaderComponent {
   accountService = inject(AccountService);
   private router = inject(Router);
 
-  logout(){
+  logout() {
     this.accountService.logout().subscribe({
-      next: async()=>{
+      next: async () => {
         this.accountService.currentUser.set(null);
         await this.router.navigateByUrl('/login');
       }

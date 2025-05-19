@@ -22,21 +22,20 @@ import {Router} from "@angular/router";
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-    private fb= inject(FormBuilder);
-    private accountService= inject(AccountService);
-    private router = inject(Router);
+  private fb = inject(FormBuilder);
+  loginForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required],
+  })
+  private accountService = inject(AccountService);
+  private router = inject(Router);
 
-    loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
+  onSubmit() {
+    this.accountService.login(this.loginForm.value).subscribe({
+      next: () => {
+        this.accountService.getUserInfo().subscribe();
+        this.router.navigate(['/shop']);
+      }
     })
-
-    onSubmit(){
-      this.accountService.login(this.loginForm.value).subscribe({
-        next: () => {
-          this.accountService.getUserInfo().subscribe();
-          this.router.navigate(['/shop']);
-        }
-      })
-    }
+  }
 }
