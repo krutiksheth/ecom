@@ -10,13 +10,14 @@ import {CheckoutComponent} from "./features/checkout/checkout.component";
 import {LoginComponent} from "./features/account/login/login.component";
 import {RegisterComponent} from "./features/account/register/register.component";
 import {authGuard} from "./core/guards/auth.guard";
+import {emptyBasketGuard} from "./core/guards/empty-basket.guard";
 
 export const routes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'shop', component: ShopComponent},
   {path: 'shop/:id', component: ProductDetailsComponent},
   {path: 'basket', component: BasketComponent},
-  {path: 'checkout', component: CheckoutComponent, canActivate: [authGuard]},
+  {path: 'checkout', component: CheckoutComponent, canActivate: [authGuard, emptyBasketGuard]},
   {path: 'login', component: LoginComponent},
   {path: 'register', component: RegisterComponent},
   {path: 'test-error', component: TestErrorComponent},
