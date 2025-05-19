@@ -973,7 +973,7 @@ Angular supports two-way bindings `[]` represents `input` and `()` represents `o
 
 - More flexible, but needs a lot of practice
 - Handles any complex scenarios
-- No data binding is done (immutable data model preferred by most developers)
+- No data binding is done (immutable data model preferred by most developers) and it uses observables
 - More component code and less HTML markup
 - Reactive transformations can be made possible such as:
 - Handling an event based on a debounce time
@@ -990,6 +990,67 @@ Angular supports two-way bindings `[]` represents `input` and `()` represents `o
 - Minimal component code
 - Automatic track of the form and its data(handled by Angular)
 - Unit testing is another challenge
+
+### Building Block of Reactive Forms
+
+- FormControl
+- FormGroup
+- FormArray
+
+### How to use reactive form module
+
+- First import `ReactiveFormModule` in `LoginComponent` and define `loginForm`
+
+```js
+@Component({
+  selector: "app-login",
+  standalone: true,
+  imports: [
+    ReactiveFormsModule, // <-- imported here
+  ],
+  templateUrl: "./login.component.html",
+  styleUrl: "./login.component.scss",
+})
+export class LoginComponent {
+   private fb= inject(FormBuilder);
+    private accountService= inject(AccountService);
+    private router = inject(Router);
+
+    loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+    })
+
+ onSubmit(){
+    console.log(this.loginForm.value);
+ }
+
+}
+```
+
+- In html code you need to use `[formGroup]` and `(ngSubmit)` make sure to use `formControlName` in `Input`
+
+```html
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <input
+    formControlName="email"
+    type="email"
+    placeholder="name@example.com"
+    matInput
+  />
+  <input
+    formControlName="password"
+    type="password"
+    placeholder="Password"
+    matInput
+  />
+  <button mat-flat-button type="submit" class="w-full py-2">Sign in</button>
+</form>
+```
+
+- Note make sure you have this configured in http service `WithCredential: true` otherwise you wont get cookie
+
+### In order to return multiple observable and wait for them we use `forkJoin` look at `InitService` code
 
 ## Setup Angular Routing
 
@@ -1190,3 +1251,295 @@ count.set(3);
 //Update value
 count.update((value) => value + 2);
 ```
+
+# Angular Reusable Form Input with Material UI
+
+This guide demonstrates how to create a reusable text input component in Angular using `ControlValueAccessor` and Angular Material's `<mat-form-field>`. It allows consistent and reusable form inputs across your application with built-in validation error messages.
+
+## 🔧 Explanation of Key Concepts
+
+### `@Input()`
+
+The `@Input()` decorator in Angular allows a child component to receive data from its parent component.
+
+In `TextInputComponent`, these are defined:
+
+```ts
+@Input() label = "";
+@Input() type = "text";
+```
+
+- `label`: The text used for the input's placeholder and error label.
+- `type`: The type of the input element (`text`, `email`, `password`, etc.).
+
+### `@Self()`
+
+The `@Self()` decorator ensures Angular injects the `NgControl` from the current component’s element only (not from any ancestor elements).
+
+```ts
+constructor(@Self() public controlDir: NgControl) {
+  this.controlDir.valueAccessor = this;
+}
+```
+
+- `NgControl` allows this component to act as a bridge between the Angular form API and native form inputs.
+- Setting `valueAccessor` enables Angular to bind this component to a `FormControl`.
+
+Without `@Self()`, Angular might accidentally try to look for `NgControl` on parent elements, which could cause incorrect behavior or errors.
+
+## 1. Shared TextInputComponent
+
+### `text-input.component.ts`
+
+```ts
+import { Component, Input, Self } from "@angular/core";
+import { ControlValueAccessor, FormControl, NgControl } from "@angular/forms";
+
+@Component({
+  selector: "app-text-input",
+  templateUrl: "./text-input.component.html",
+})
+export class TextInputComponent implements ControlValueAccessor {
+  @Input() label = "";
+  @Input() type = "text";
+
+  constructor(@Self() public controlDir: NgControl) {
+    this.controlDir.valueAccessor = this;
+  }
+
+  get control(): FormControl {
+    return this.controlDir.control as FormControl;
+  }
+
+  writeValue(obj: any): void {}
+  registerOnChange(fn: any): void {}
+  registerOnTouched(fn: any): void {}
+}
+```
+
+### `text-input.component.html`
+
+```html
+<mat-form-field appearance="outline" class="w-full mb-4">
+  <mat-label>{{ label }}</mat-label>
+  <input [formControl]="control" matInput [placeholder]="label" [type]="type" />
+
+  @if (control.hasError('required')) {
+  <mat-error>{{ label }} is required</mat-error>
+  } @if (control.hasError('email')) {
+  <mat-error>Email is invalid</mat-error>
+  }
+</mat-form-field>
+```
+
+## 2. Using TextInputComponent in a Form
+
+### `register.component.html`
+
+```html
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+  <app-text-input
+    formControlName="firstName"
+    label="First Name"
+  ></app-text-input>
+  <app-text-input formControlName="lastName" label="Last Name"></app-text-input>
+  <app-text-input
+    formControlName="email"
+    label="Email"
+    type="email"
+  ></app-text-input>
+  <app-text-input
+    formControlName="password"
+    label="Password"
+    type="password"
+  ></app-text-input>
+  <button mat-raised-button color="primary" type="submit">Register</button>
+</form>
+```
+
+### `register.component.ts`
+
+```ts
+import { Component, inject } from "@angular/core";
+import { FormBuilder, Validators } from "@angular/forms";
+import { Router } from "@angular/router";
+import { AccountService } from "../services/account.service";
+import { SnackbarService } from "../services/snackbar.service";
+
+@Component({
+  selector: "app-register",
+  templateUrl: "./register.component.html",
+})
+export class RegisterComponent {
+  private fb = inject(FormBuilder);
+  private accountService = inject(AccountService);
+  private router = inject(Router);
+  private snack = inject(SnackbarService);
+
+  passwordValidation = new RegExp(
+    /(?=^.{6,10}$)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+}{"':;?/>.<,])(?!.*\s).*$/
+  );
+
+  validationErrors?: string[];
+
+  registerForm = this.fb.group({
+    firstName: [null, Validators.required],
+    lastName: [null, Validators.required],
+    email: ["", [Validators.required, Validators.email]],
+    password: ["", Validators.required],
+  });
+
+  onSubmit() {
+    if (this.registerForm.valid) {
+      console.log(this.registerForm.value);
+      // call API here
+    } else {
+      this.snack.show("Please correct errors before submitting");
+    }
+  }
+}
+```
+
+## Summary
+
+✅ This setup helps you:
+
+- Reduce repeated form markup.
+- Provide consistent validation messages.
+- Improve form maintainability.
+
+🧩 **Key Angular Concepts Used:**
+
+- `@Input()` to pass dynamic values from parent
+- `@Self()` to inject the current form control only
+- `ControlValueAccessor` to integrate custom components with Angular Forms
+
+## AuthGuard Implementation
+
+### What is an AuthGuard?
+
+An **AuthGuard** is used to protect specific routes in the application, ensuring that only authenticated users can access them. It checks the user's authentication status before allowing access to protected routes.
+
+---
+
+### Changes Made
+
+1. **Created the AuthGuard**  
+   The `AuthGuard` checks if the user is authenticated. If not, it redirects them to the login page.
+
+2. **Updated Routing**  
+   Routes requiring authentication were updated to include the `AuthGuard`.
+
+3. **Account Service Updates**  
+   Added a method to check if the user is logged in by verifying the presence of a valid token.
+
+4. **Return URL Handling**  
+   To improve user experience, the `AuthGuard` now captures the `returnUrl` (the URL the user was trying to access) and passes it to the login page. After successful login, the user is redirected back to the original URL.
+
+5. **Modified AuthGuard to Use Observables**  
+   The `AuthGuard` was updated to use observables instead of synchronous checks. This change was made to handle asynchronous operations, such as fetching user authentication status from an API or a state management store.
+
+---
+
+### Why Use Observables in AuthGuard?
+
+Using observables in the `AuthGuard` allows us to handle asynchronous operations, such as:
+
+- **Fetching User Authentication Status:** If the authentication status is stored on the server or in a state management store, it may require an API call or subscription to a state change.
+- **Real-Time Updates:** Observables enable real-time updates to the authentication status, ensuring the guard always has the latest information.
+- **Improved Flexibility:** Observables provide a more flexible and reactive approach to handling authentication logic compared to synchronous methods.
+
+---
+
+### Updated AuthGuard Code
+
+```typescript
+import { Injectable } from "@angular/core";
+import {
+  CanActivate,
+  Router,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from "@angular/router";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { AccountService } from "../services/account.service";
+
+@Injectable({
+  providedIn: "root",
+})
+export class AuthGuard implements CanActivate {
+  constructor(private accountService: AccountService, private router: Router) {}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot
+  ): Observable<boolean> {
+    return this.accountService.isLoggedIn().pipe(
+      map((isAuthenticated) => {
+        if (isAuthenticated) {
+          return true;
+        } else {
+          this.router.navigate(["/login"], {
+            queryParams: { returnUrl: state.url },
+          });
+          return false;
+        }
+      })
+    );
+  }
+}
+```
+
+---
+
+### How to Use
+
+- Add `canActivate: [AuthGuard]` to any route you want to protect in the routing configuration.
+- Ensure the `AccountService` provides an observable for the authentication status.
+
+---
+
+### Example
+
+**Routing Configuration:**
+
+```typescript
+import { Routes } from "@angular/router";
+import { AuthGuard } from "./core/guards/auth.guard";
+
+export const routes: Routes = [
+  { path: "", component: HomeComponent },
+  { path: "shop", component: ShopComponent },
+  { path: "checkout", component: CheckoutComponent, canActivate: [AuthGuard] }, // Protected route
+  { path: "**", redirectTo: "", pathMatch: "full" },
+];
+```
+
+---
+
+### Testing
+
+- **Scenario 1:** Accessing a protected route while logged in:
+  - Expected Result: The user is allowed to access the route.
+- **Scenario 2:** Accessing a protected route without being logged in:
+  - Expected Result: The user is redirected to the login page with the `returnUrl` query parameter.
+- **Scenario 3:** Logging in after being redirected:
+  - Expected Result: The user is redirected back to the original URL.
+
+---
+
+### Summary
+
+✅ This setup helps you:
+
+- Protect sensitive routes with authentication.
+- Redirect users to the login page if they are not authenticated.
+- Automatically return users to their intended page after login.
+- Handle asynchronous authentication checks using observables.
+
+🧩 **Key Angular Concepts Used:**
+
+- `CanActivate` to guard routes.
+- `ActivatedRouteSnapshot` and `RouterStateSnapshot` to capture the current route.
+- Observables and RxJS operators (`map`) for asynchronous authentication handling.

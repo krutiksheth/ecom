@@ -1,15 +1,16 @@
-import {Component, inject, OnInit, signal} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {BasketService} from "../../core/services/basket.service";
-import {Basket} from "../../shared/models/basket";
 import {BasketItemComponent} from "./basket-item/basket-item.component";
 import {OrderSummaryComponent} from "../../shared/components/order-summary/order-summary.component";
+import {EmptyStateComponent} from "../../shared/components/empty-state/empty-state.component";
 
 @Component({
   selector: 'app-basket',
   standalone: true,
   imports: [
     BasketItemComponent,
-    OrderSummaryComponent
+    OrderSummaryComponent,
+    EmptyStateComponent
   ],
   templateUrl: './basket.component.html',
   styleUrl: './basket.component.scss'
