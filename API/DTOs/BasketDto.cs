@@ -5,11 +5,15 @@ namespace API.DTOs;
 public class BasketDto
 {
     public int Id { get; set; }
-    
+
     public required string BasketId { get; set; }
 
     public List<BasketItemDto> Items { get; set; } = [];
-    
+
+    public string? ClientSecret { get; set; }
+
+    public string? PaymentIntentId { get; set; }
+
     public void AddItem(Product product, int quantity)
     {
         if (product == null)
@@ -21,11 +25,8 @@ public class BasketDto
         var existingItem = FindItem(product.Id);
 
         if (existingItem != null)
-        {
             existingItem.Quantity += quantity;
-        }
         else
-        {
             Items.Add(new BasketItemDto
             {
                 ProductId = product.Id,
@@ -34,11 +35,10 @@ public class BasketDto
                 Name = product.Name,
                 PictureUrl = product.PictureUrl,
                 Type = product.Type,
-                Quantity = quantity,
+                Quantity = quantity
             });
-        }
     }
-    
+
     public void RemoveItem(int productId, int quantity)
     {
         if (quantity <= 0)
@@ -53,7 +53,7 @@ public class BasketDto
         if (existingItem.Quantity <= 0)
             Items.Remove(existingItem);
     }
-    
+
     private BasketItemDto? FindItem(int productId)
     {
         return Items.FirstOrDefault(x => x.ProductId == productId);

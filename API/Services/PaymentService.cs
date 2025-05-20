@@ -1,16 +1,16 @@
-﻿using API.Entities;
+﻿using API.DTOs;
 using Stripe;
 
 namespace API.Services;
 
 public class PaymentService(IConfiguration config)
 {
-    public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(Basket basket)
+    public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(BasketDto basket)
     {
         StripeConfiguration.ApiKey = config["StripeSettings:SecretKey"];
         var service = new PaymentIntentService();
         var intent = new PaymentIntent();
-        var subTotal = basket.Items.Sum(x => x.Quantity * x.Product.Price);
+        var subTotal = basket.Items.Sum(x => x.Quantity * x.Price);
         var delivery = subTotal > 10000 ? 0 : 500;
 
         if (string.IsNullOrEmpty(basket.PaymentIntentId))
@@ -19,7 +19,7 @@ public class PaymentService(IConfiguration config)
             {
                 Amount = subTotal + delivery,
                 Currency = "usd",
-                PaymentMethodTypes = ["cards"]
+                PaymentMethodTypes = ["card"]
             };
 
             intent = await service.CreateAsync(options);
