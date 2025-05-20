@@ -141,6 +141,23 @@ dotnet ef migrations add IdentityAdded
 dotnet ef database update
 ```
 
+## Setup Stripe
+
+- Install this package
+
+```sh
+dotnet tool install Stripe.net
+```
+
+- Now add your stripe configuration in `appsettings.development.json`
+
+```json
+ "StripeSettings": {
+    "PublishableKey": "your key",
+    "SecretKey": "your key"
+  }
+```
+
 ---
 
 # React
