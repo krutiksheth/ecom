@@ -30,6 +30,7 @@ builder.Services.AddCors();
 // AddScoped -> service will be available when request comes in and will be available for the entirity of the request
 // AddTransient -> service will only be created for specific method where it is needed
 // AddSingleton -> service will be instantiated when application starts and is disposed when application ends
+builder.Services.AddScoped<PaymentService>();
 builder.Services.AddTransient<ExceptionMiddleware>();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSingleton<IConnectionMultiplexer>(config =>

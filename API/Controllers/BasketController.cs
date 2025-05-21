@@ -1,6 +1,8 @@
-﻿﻿using API.Data;
+﻿using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
+using API.RequestHelpers;
 using API.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +14,7 @@ public class BasketController(
     IBasketService basketService,
     IMapper mapper) : BaseApiController
 {
-    private readonly string basketCookieName = "BasketId";
+    //private readonly string basketCookieName = "BasketId";
 
     /*[HttpGet]
     public async Task<ActionResult<Basket>> GetBasket()
@@ -50,7 +52,7 @@ public class BasketController(
             return BadRequest("Problem updating item to Basket");
         }
 
-        // This returns location header 
+        // This returns location header
         return CreatedAtAction(nameof(GetBasket), mapper.Map<BasketDto>(basket));
     }
 
@@ -108,7 +110,7 @@ public class BasketController(
     [HttpGet]
     public async Task<ActionResult<Basket>> GetBasket()
     {
-        var basket = await FindBasket();
+        var basket = await this.FindBasket(basketService);
 
         return Ok(basket);
     }
@@ -117,18 +119,18 @@ public class BasketController(
     public async Task<ActionResult<BasketDto>> AddItemToBasket(int productId, int quantity)
     {
         var product = await context.Products.FindAsync(productId);
-        
+
         if (product == null)
             return BadRequest("Problem adding item to Basket");
-        
-        var basket = await FindBasket() ?? CreateBasket();
-        
+
+        var basket = await this.FindBasket(basketService) ?? CreateBasket();
+
         basket.AddItem(product, quantity);
 
         var result = await basketService.AddItemToBasket(basket);
-        
+
         if (!result) return BadRequest("Problem adding item from Basket");
-        
+
         return CreatedAtAction(nameof(GetBasket), basket);
     }
 
@@ -136,29 +138,29 @@ public class BasketController(
     public async Task<ActionResult> RemoveItemFromBasket(int productId, int quantity)
     {
         //get basket
-        var basket = await FindBasket();
+        var basket = await this.FindBasket(basketService);
 
         if (basket == null) return BadRequest("Problem remove item to Basket");
 
         //remove item or reduce quantity
         basket.RemoveItem(productId, quantity);
-        
+
         var result = await basketService.RemoveItemFromBasket(basket);
 
         if (!result) return BadRequest("Problem removing item from Basket");
-        
+
         return Ok();
     }
 
-    private async Task<BasketDto> FindBasket()
-    {
-        Request.Cookies.TryGetValue(basketCookieName, out string basketId);
-        
-        if(string.IsNullOrEmpty(basketId)) return null;
-        
-        return await basketService.GetBasket(basketId);
-    }
-    
+    // private async Task<BasketDto> FindBasket()
+    // {
+    //     Request.Cookies.TryGetValue(Constants.BasketCookieName, out var basketId);
+    //
+    //     if (string.IsNullOrEmpty(basketId)) return null;
+    //
+    //     return await basketService.GetBasket(basketId);
+    // }
+
     private BasketDto CreateBasket()
     {
         var basketId = Guid.NewGuid().ToString();
@@ -166,14 +168,14 @@ public class BasketController(
         var cookieOption = new CookieOptions
         {
             IsEssential = true,
-            Expires = DateTimeOffset.UtcNow.AddDays(30),
+            Expires = DateTimeOffset.UtcNow.AddDays(30)
         };
 
-        Response.Cookies.Append(basketCookieName, basketId, cookieOption);
+        Response.Cookies.Append(Constants.BasketCookieName, basketId, cookieOption);
 
         var basket = new BasketDto
         {
-            BasketId = basketId,
+            BasketId = basketId
         };
 
         return basket;

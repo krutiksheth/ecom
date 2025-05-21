@@ -12,6 +12,10 @@ public class Basket
     // 1-* relationship (i.e) one basket can have many items
     public List<BasketItem> Items { get; set; } = [];
 
+    public string? ClientSecret { get; set; }
+
+    public string? PaymentIntentId { get; set; }
+
     public void AddItem(Product product, int quantity)
     {
         if (product == null)
@@ -23,17 +27,13 @@ public class Basket
         var existingItem = FindItem(product.Id);
 
         if (existingItem != null)
-        {
             existingItem.Quantity += quantity;
-        }
         else
-        {
             Items.Add(new BasketItem
             {
                 Product = product,
-                Quantity = quantity,
+                Quantity = quantity
             });
-        }
     }
 
     public void RemoveItem(int productId, int quantity)
