@@ -846,6 +846,61 @@ const onSubmit = (data: LoginSchema) => {
 - [Zod Documentation](https://zod.dev/)
 - [@hookform/resolvers GitHub](https://github.com/react-hook-form/resolvers)
 
+## Setup React Stripe
+
+- Install this package
+
+```sh
+npm install @stripe/react-stripe-js @stripe/stripe-js
+```
+
+- Now create a `.env` file and since we are using `vite` prefix environment variables with `VITE_`
+
+```
+VITE_API_URL=https://localhost:5001/api
+VITE_STRIPE_PK= <your api key without quotes>
+```
+
+- To access environment variable in typescript
+
+```
+import.meta.env.<Your variable name>
+```
+
+- Now wrap your checkout component with element and review the following sample code
+
+```js
+const stripePromise = loadStripe(import.meta.env.STRIPE_PK);
+const CheckoutPage = () => {
+  const { data: basket } = useFetchBasketQuery();
+  const options: StripeElementsOptions | undefined = useMemo(() => {
+    if (!basket?.clientSecret) return undefined;
+    return {
+      clientSecret: basket?.clientSecret,
+    };
+  }, [basket?.clientSecret]);
+
+  return (
+    <Grid2 container spacing={2}>
+      <Grid2 size={8}>
+        {!stripePromise || !options ? (
+          <Typography variant="h6" component="div">
+            Loading checkout...
+          </Typography>
+        ) : (
+          <Elements stripe={stripePromise}>
+            <CheckoutStepper></CheckoutStepper>
+          </Elements>
+        )}
+      </Grid2>
+      <Grid2 size={4}>
+        <OrderSummary />
+      </Grid2>
+    </Grid2>
+  );
+};
+```
+
 ---
 
 # Angular

@@ -1,17 +1,18 @@
-﻿import { Box, Typography, Divider, Button, TextField, Paper } from "@mui/material";
+﻿import {Box, Button, Divider, Paper, TextField, Typography} from "@mui/material";
 import {currencyFormat} from "../../lib/util.ts";
 import {useFetchBasketQuery} from "../../features/basket/basketApi.ts";
-import { Link } from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
 
 export default function OrderSummary() {
-    
+
     const {data: basket} = useFetchBasketQuery();
-    const subtotal = basket?.items.reduce((total, item) => total+ (item.quantity * item.price), 0) ?? 0;
+    const subtotal = basket?.items.reduce((total, item) => total + (item.quantity * item.price), 0) ?? 0;
     const deliveryFee = subtotal > 10000 ? 0 : 500;
-    
+    const location = useLocation();
+
     return (
         <Box display="flex" flexDirection="column" alignItems="center" maxWidth="lg" mx="auto">
-            <Paper sx={{ mb: 2, p: 3, width: '100%', borderRadius: 3 }}>
+            <Paper sx={{mb: 2, p: 3, width: '100%', borderRadius: 3}}>
 
                 <Typography variant="h6" component="p" fontWeight="bold">
                     Order summary
@@ -39,7 +40,7 @@ export default function OrderSummary() {
                             {currencyFormat(deliveryFee)}
                         </Typography>
                     </Box>
-                    <Divider sx={{ my: 2 }} />
+                    <Divider sx={{my: 2}}/>
                     <Box display="flex" justifyContent="space-between" mb={1}>
                         <Typography color="textSecondary">Total</Typography>
                         <Typography>
@@ -49,16 +50,16 @@ export default function OrderSummary() {
                 </Box>
 
                 <Box mt={2}>
-                    <Button
+                    {!location.pathname.includes("checkout") && (<Button
                         component={Link}
                         to="/checkout"
                         variant="contained"
                         color="primary"
                         fullWidth
-                        sx={{ mb: 1 }}
+                        sx={{mb: 1}}
                     >
                         Checkout
-                    </Button>
+                    </Button>)}
                     <Button
                         component={Link}
                         to="/catalog"
@@ -70,7 +71,7 @@ export default function OrderSummary() {
             </Paper>
 
             {/* Coupon Code Section */}
-            <Paper sx={{ width: '100%', borderRadius: 3, p: 3 }}>
+            <Paper sx={{width: '100%', borderRadius: 3, p: 3}}>
 
                 <form>
                     <Typography variant="subtitle1" component="label">
@@ -81,7 +82,7 @@ export default function OrderSummary() {
                         label="Voucher code"
                         variant="outlined"
                         fullWidth
-                        sx={{ my: 2 }}
+                        sx={{my: 2}}
                     />
 
                     <Button
