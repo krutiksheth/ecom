@@ -1,5 +1,7 @@
-﻿import {Box, Button, Paper, Step, StepLabel, Stepper} from "@mui/material";
+﻿import {Box, Button, Checkbox, FormControlLabel, Paper, Step, StepLabel, Stepper} from "@mui/material";
 import {useState} from "react";
+import {AddressElement, PaymentElement} from "@stripe/react-stripe-js";
+import Review from "./Review.tsx";
 
 const CheckoutStepper = () => {
     const steps = ['Address', 'Payment', 'Review'];
@@ -22,13 +24,21 @@ const CheckoutStepper = () => {
             </Stepper>
             <Box sx={{mt: 2}}>
                 <Box sx={{display: activeStep === 0 ? 'block' : 'none'}}>
-                    Address
+                    <AddressElement options={{
+                        mode: 'shipping'
+                    }}/>
+                    <FormControlLabel
+                        sx={{display: "flex", justifyContent: "end"}}
+                        label="Save as default address"
+                        control={<Checkbox/>}></FormControlLabel>
                 </Box>
                 <Box sx={{display: activeStep === 1 ? 'block' : 'none'}}>
-                    Payment
+                    <PaymentElement options={{
+                        paymentMethodOrder: ["card"]
+                    }}/>
                 </Box>
                 <Box sx={{display: activeStep === 2 ? 'block' : 'none'}}>
-                    Review
+                    <Review/>
                 </Box>
             </Box>
             <Box display="flex" paddingTop={2} justifyContent="space-between">
