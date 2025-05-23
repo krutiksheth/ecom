@@ -93,7 +93,7 @@ export const basketApi = createApi({
                     draft.items = [];
                 }));
 
-                Cookies.remove("basketId");
+                Cookies.remove("BasketId");
             }
         })
     })
