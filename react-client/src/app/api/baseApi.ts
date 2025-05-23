@@ -4,16 +4,14 @@ import {toast} from "react-toastify";
 import {router} from '../routes/Router.tsx';
 
 const customBaseQuery = fetchBaseQuery({
-    baseUrl: "https://localhost:5001/api",
-    credentials:"include",
+    baseUrl: import.meta.env.VITE_API_URL,
+    credentials: "include",
 });
 
 type ErrorResponse = | string | { title: string } | { errors: string[] };
 
 const sleep = () =>
     new Promise(resolve => setTimeout(resolve, 1000));
-
-
 
 
 export const baseQueryWithErrorHandling = async (args: string | FetchArgs, api: BaseQueryApi, extraOptions: object) => {

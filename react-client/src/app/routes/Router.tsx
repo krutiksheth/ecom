@@ -12,6 +12,7 @@ import CheckoutPage from "../../features/checkout/CheckoutPage.tsx";
 import LoginForm from "../../features/account/LoginForm.tsx";
 import RegisterForm from "../../features/account/RegisterForm.tsx";
 import RequireAuth from "./RequireAuth.tsx";
+import CheckoutSuccess from "../../features/checkout/CheckoutSuccess.tsx";
 
 export const router = createBrowserRouter([
     {
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
             {
                 element: <RequireAuth/>, children: [
                     {path: "checkout", element: <CheckoutPage/>}, // specify contact component 
+                    {path: "checkout/success", element: <CheckoutSuccess/>}, // specify contact component 
                 ]
             },
             {path: "", element: <HomePage/>}, // specify home component
@@ -29,7 +31,7 @@ export const router = createBrowserRouter([
             {path: "about", element: <AboutPage/>}, // specify about component 
             {path: "contact", element: <ContactPage/>}, // specify contact component 
             {path: "basket", element: <BasketPage/>}, // specify contact component 
-
+            
             {path: "login", element: <LoginForm/>}, // specify contact component 
             {path: "register", element: <RegisterForm/>}, // specify contact component 
             {path: "server-error", element: <ServerError/>}, // specify server-error component 
