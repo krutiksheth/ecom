@@ -1,78 +1,113 @@
 ﻿import {createApi} from "@reduxjs/toolkit/query/react";
 import {baseQueryWithErrorHandling} from "../../app/api/baseApi.ts";
-import {User} from "../../app/models/user.ts";
+import {Address, User} from "../../app/models/user.ts";
 import {LoginSchema} from "../../lib/schemas/loginSchema.ts";
 import {router} from "../../app/routes/Router.tsx";
 import {RegisterSchema} from "../../lib/schemas/registerSchema.ts";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 
-export const accountApi= createApi({
+export const accountApi = createApi({
     reducerPath: 'accountApi',
     baseQuery: baseQueryWithErrorHandling,
     tagTypes: ['UserInfo'],
-    endpoints:(builder)=>({
+    endpoints: (builder) => ({
         login: builder.mutation<void, LoginSchema>({
-            query: (creds)=>{
+            query: (creds) => {
                 return {
-                    url:"login?useCookies=true",
-                    method:"POST",
+                    url: "login?useCookies=true",
+                    method: "POST",
                     body: creds
                 }
             },
-            async onQueryStarted(_, {dispatch, queryFulfilled}){
+            async onQueryStarted(_, {dispatch, queryFulfilled}) {
                 try {
                     await queryFulfilled;
                     dispatch(accountApi.util.invalidateTags(["UserInfo"]));
-                }catch (error) {
+                } catch (error) {
                     console.log(error)
                 }
             }
         }),
         register: builder.mutation<void, RegisterSchema>({
-            query:(register) =>{
+            query: (register) => {
                 return {
-                    url:"account/register",
-                    method:"POST",
+                    url: "account/register",
+                    method: "POST",
                     body: register
                 }
             },
-            async onQueryStarted(_, {queryFulfilled}){
+            async onQueryStarted(_, {queryFulfilled}) {
                 try {
                     await queryFulfilled;
                     toast.success("Registration successful - you can now sign in!")
                     await router.navigate("/login");
-                }catch (error) {
+                } catch (error) {
                     console.log(error);
                     throw error;
                 }
             }
         }),
-        userInfo:builder.query<User, void>({
-            query: ()=>{
+        userInfo: builder.query<User, void>({
+            query: () => {
                 return {
                     url: "account/user-info",
                 }
             },
-            providesTags:["UserInfo"]
+            providesTags: ["UserInfo"]
         }),
         logout: builder.mutation({
-            query:()=>{
+            query: () => {
                 return {
                     url: "account/logout",
                     method: "POST"
                 }
             },
-            async onQueryStarted(_, {dispatch, queryFulfilled}){
+            async onQueryStarted(_, {dispatch, queryFulfilled}) {
                 try {
                     await queryFulfilled;
                     dispatch(accountApi.util.invalidateTags(["UserInfo"]));
                     await router.navigate("/catalog");
-                }catch (error) {
+                } catch (error) {
                     console.log(error)
                 }
             }
-        })
+        }),
+        fetchAddress: builder.query<Address, void>({
+            query: () => {
+                return {
+                    url: "account/address",
+                }
+            }
+        }),
+        updateAddress: builder.mutation<Address, Address>({
+            query: (address) => {
+                return {
+                    url: "account/address",
+                    method: "POST",
+                    body: address
+                }
+            },
+            onQueryStarted: async (address, {dispatch, queryFulfilled}) => {
+                const patchResult = dispatch(accountApi.util.updateQueryData("fetchAddress", undefined, (draft) => {
+                    return {...draft, ...address}
+                }));
+                try {
+                    await queryFulfilled;
+                    toast.success("Address updated successfully");
+                } catch (error) {
+                    console.log(error);
+                    patchResult.undo();
+                }
+            }
+        }),
     })
 });
 
-export const { useLoginMutation, useRegisterMutation, useLogoutMutation, useUserInfoQuery } = accountApi;
+export const {
+    useLoginMutation,
+    useRegisterMutation,
+    useLogoutMutation,
+    useUserInfoQuery,
+    useFetchAddressQuery,
+    useUpdateAddressMutation
+} = accountApi;
