@@ -901,6 +901,23 @@ const CheckoutPage = () => {
 };
 ```
 
+## React Cookies package
+
+- Installation
+
+```sh
+npm i js-cookie --legacy-peer-deps
+npm i -D @types/js-cookie --legacy-peer-deps
+```
+
+- In order to remove cookies
+
+```js
+import Cookies from "js-cookie"
+...
+...
+Cookies.remove("basketId")
+```
 ---
 
 # Angular

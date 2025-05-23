@@ -3,6 +3,7 @@ import {baseQueryWithErrorHandling} from "../../app/api/baseApi.ts";
 import {Basket, Item} from "../../app/models/basket.ts";
 import {Product} from "../../app/models/product.ts";
 import {isBasketItem} from "../../lib/util.ts";
+import Cookies from "js-cookie";
 
 export const basketApi = createApi({
     reducerPath: 'basketApi',
@@ -84,9 +85,24 @@ export const basketApi = createApi({
                     patchResult.undo();
                 }
             }
+        }),
+        clearBasket: builder.mutation<void, void>({
+            queryFn: () => ({data: undefined}),
+            onQueryStarted: (_, {dispatch}) => {
+                dispatch(basketApi.util.updateQueryData("fetchBasket", undefined, (draft) => {
+                    draft.items = [];
+                }));
+
+                Cookies.remove("basketId");
+            }
         })
     })
-});
+})
 
-export const {useFetchBasketQuery, useAddBasketItemMutation, useRemoveBasketItemMutation} = basketApi;
+export const {
+    useFetchBasketQuery,
+    useAddBasketItemMutation,
+    useRemoveBasketItemMutation,
+    useClearBasketMutation
+} = basketApi;
 

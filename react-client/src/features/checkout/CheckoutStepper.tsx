@@ -1,35 +1,91 @@
 ﻿import {Box, Button, Checkbox, FormControlLabel, Paper, Step, StepLabel, Stepper, Typography} from "@mui/material";
 import {useState} from "react";
-import {AddressElement, PaymentElement, useElements} from "@stripe/react-stripe-js";
+import {AddressElement, PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import Review from "./Review.tsx";
 import {useFetchAddressQuery, useUpdateAddressMutation} from "../account/accountApi.ts";
 import {Address} from "../../app/models/user.ts";
-import {StripeAddressElementChangeEvent, StripePaymentElementChangeEvent} from "@stripe/stripe-js";
+import {ConfirmationToken, StripeAddressElementChangeEvent, StripePaymentElementChangeEvent} from "@stripe/stripe-js";
 import {useBasket} from "../../lib/hooks/useBasket.ts";
 import {currencyFormat} from "../../lib/util.ts";
+import {toast} from "react-toastify";
+import {useNavigate} from "react-router-dom";
+import {LoadingButton} from "@mui/lab";
 
 const CheckoutStepper = () => {
     const steps = ['Address', 'Payment', 'Review'];
     const [activeStep, setActiveStep] = useState(0);
     const {data: {name, ...restAddress} = {} as Address, isLoading} = useFetchAddressQuery();
     const [updateAddress] = useUpdateAddressMutation();
-    const [saveAddressChecked, setSaveAddressChecked] = useState(false);
+    const {total, basket, clearBasket} = useBasket();
+    const stripe = useStripe();
     const elements = useElements();
+    const [saveAddressChecked, setSaveAddressChecked] = useState(false);
     const [addressComplete, setAddressComplete] = useState(false);
     const [paymentComplete, setPaymentComplete] = useState(false);
-    const {total} = useBasket();
+    const [confirmationToken, setConfirmationToken] = useState<ConfirmationToken | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+    const navigate = useNavigate();
 
     const handleNext = async () => {
         if (activeStep === 0 && saveAddressChecked && elements) {
             const address = await getStripeAddress();
             if (address) {
-                updateAddress(address);
+                await updateAddress(address);
             }
         }
-        setActiveStep(prevStep => prevStep + 1);
+        if (activeStep === 1) {
+            if (!elements || !stripe) return;
+
+            const result = await elements.submit();
+
+            if (result.error) return toast.error(result.error.message);
+
+            const stripeResult = await stripe.createConfirmationToken({elements});
+
+            if (stripeResult.error) return toast.error(stripeResult.error.message);
+
+            setConfirmationToken(stripeResult.confirmationToken);
+        }
+        if (activeStep === 2) {
+            await confirmPayment();
+        }
+        if (activeStep < 2) setActiveStep(step => step + 1);
 
     }
 
+
+    const confirmPayment = async () => {
+        setSubmitting(true);
+        try {
+            if (!confirmationToken || !basket?.clientSecret) throw new Error("unable to process payment");
+
+            const paymentResult = await stripe?.confirmPayment({
+                clientSecret: basket.clientSecret,
+                redirect: "if_required",
+                confirmParams: {
+                    confirmation_token: confirmationToken.id
+                }
+            });
+
+            if (paymentResult?.paymentIntent?.status === "succeeded") {
+                navigate("/checkout/success");
+                clearBasket();
+            } else if (paymentResult?.error) {
+                throw new Error(paymentResult?.error.message);
+            } else {
+                throw new Error("something went wrong")
+            }
+
+        } catch (error) {
+            if (error instanceof Error) {
+                toast.error(error.message);
+            } 
+                setActiveStep(step => step - 1);
+          
+        } finally {
+            setSubmitting(false);
+        }
+    }
     const getStripeAddress = async () => {
         const addressElement = elements?.getElement("address");
 
@@ -86,15 +142,17 @@ const CheckoutStepper = () => {
                     }}/>
                 </Box>
                 <Box sx={{display: activeStep === 2 ? 'block' : 'none'}}>
-                    <Review/>
+                    <Review confirmationToken={confirmationToken}/>
                 </Box>
             </Box>
             <Box display="flex" paddingTop={2} justifyContent="space-between">
                 <Button onClick={handleBack}>Back</Button>
-                <Button disabled={(activeStep === 0 && !addressComplete) || (activeStep === 1) && !paymentComplete}
-                        onClick={handleNext}>{
+                <LoadingButton
+                    loading={submitting}
+                    disabled={(activeStep === 0 && !addressComplete) || (activeStep === 1) && !paymentComplete || submitting}
+                    onClick={handleNext}>{
                     activeStep === steps.length - 1 ? `Pay ${currencyFormat(total)}` : "Next"
-                }</Button>
+                }</LoadingButton>
             </Box>
         </Paper>
     );
