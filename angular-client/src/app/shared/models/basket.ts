@@ -1,11 +1,14 @@
 ﻿import {nanoid} from "nanoid";
-import {Product} from "./product";
-export type BasketType ={
-  basketId : string,
-  items: Item[]
+
+export type BasketType = {
+  basketId: string,
+  items: Item[],
+  deliveryMethodId?: number,
+  clientSecret?: string
+  paymentIntentId?: string
 }
 
-export type Item= {
+export type Item = {
   productId: number
   name: string
   price: number
@@ -16,6 +19,9 @@ export type Item= {
 }
 
 export class Basket implements BasketType {
-  basketId= nanoid();
-  items: Item[] =[];
+  deliveryMethodId?: number;
+  clientSecret?: string | undefined;
+  paymentIntentId?: string | undefined;
+  basketId = nanoid();
+  items: Item[] = [];
 }
