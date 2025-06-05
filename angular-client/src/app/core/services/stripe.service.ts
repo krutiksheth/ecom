@@ -5,6 +5,7 @@ import {HttpClient} from "@angular/common/http";
 import {BasketService} from "./basket.service";
 import {firstValueFrom, map} from "rxjs";
 import {Basket} from "../../shared/models/basket";
+import {AccountService} from "./account.service";
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ import {Basket} from "../../shared/models/basket";
 export class StripeService {
   baseUrl = environment.apiUrl;
   http = inject(HttpClient);
+  accountService = inject(AccountService);
   stripePromise: Promise<Stripe | null>;
   basketService = inject(BasketService);
   elements?: StripeElements;
@@ -46,10 +48,30 @@ export class StripeService {
 
   async createAddressElement() {
     if (!this.addressElements) {
+      this.accountService.getAddresses();
       const elements = await this.initializeElements();
+      let defaultValues: StripeAddressElementOptions['defaultValues'] = {};
+
       if (elements) {
+        const address = this.accountService.address;
+
+        if (address) {
+          defaultValues.name = address.name;
+          defaultValues.address = {
+            line1: address.line1,
+            line2: address.line2,
+            city: address.city,
+            state: address.state,
+            country: address.country,
+            postal_code: address.postal_code,
+          };
+        }
+
+        console.log("defaultValues", defaultValues);
+
         const options: StripeAddressElementOptions = {
           mode: "shipping",
+          defaultValues: defaultValues
         };
 
         this.addressElements = elements.create("address", options);
@@ -72,5 +94,10 @@ export class StripeService {
         return basket;
       })
     )
+  }
+
+  disposeElements() {
+    this.elements = undefined;
+    this.addressElements = undefined;
   }
 }
