@@ -4,13 +4,14 @@ import {MatStepperModule} from "@angular/material/stepper";
 import {MatButton} from "@angular/material/button";
 import {RouterLink} from "@angular/router";
 import {StripeService} from "../../core/services/stripe.service";
-import {StripeAddressElement} from "@stripe/stripe-js";
+import {StripeAddressElement, StripePaymentElement} from "@stripe/stripe-js";
 import {SnackbarService} from "../../core/services/snackbar.service";
 import {MatCheckboxChange, MatCheckboxModule} from "@angular/material/checkbox";
 import {StepperSelectionEvent} from "@angular/cdk/stepper";
 import {AccountService} from "../../core/services/account.service";
 import {firstValueFrom} from "rxjs";
 import {Address} from "../../shared/models/user";
+import {CheckoutDeliveryComponent} from "./checkout-delivery/checkout-delivery.component";
 
 @Component({
   selector: 'app-checkout',
@@ -21,6 +22,7 @@ import {Address} from "../../shared/models/user";
     MatButton,
     RouterLink,
     MatCheckboxModule,
+    CheckoutDeliveryComponent,
   ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
@@ -29,6 +31,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   stripeService = inject(StripeService);
   addressElement?: StripeAddressElement;
+  paymentElement?: StripePaymentElement;
   snackBar = inject(SnackbarService);
   saveAddress: boolean = false;
   private accountService = inject(AccountService);
@@ -37,6 +40,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     try {
       this.addressElement = await this.stripeService.createAddressElement();
       this.addressElement.mount("#address-element");
+
+      this.paymentElement = await this.stripeService.createPaymentElement();
+      this.paymentElement.mount("#payment-element");
     } catch (error: any) {
       this.snackBar.error(error.message);
     }
