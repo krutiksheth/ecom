@@ -1,5 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {
+  ConfirmationToken,
   loadStripe,
   Stripe,
   StripeAddressElement,
@@ -133,6 +134,29 @@ export class StripeService {
     }
   }
 
+  async confirmPayment(confirmationToken: ConfirmationToken) {
+    const stripe = await this.getStripeInstance();
+    const elements = await this.initializeElements();
+    const result = await elements.submit();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    const clientSecret = this.basketService.basket()?.clientSecret;
+
+    if(stripe && clientSecret) {
+      return await stripe.confirmPayment({
+        clientSecret: clientSecret,
+        confirmParams: {
+          confirmation_token: confirmationToken.id
+        },
+        redirect:"if_required"
+      });
+    }else{
+      throw new Error("Unable to confirm payment, Stripe or client secret is not initialized");
+    }
+  }
 
   disposeElements() {
     this.elements = undefined;

@@ -4,9 +4,9 @@
   </h4>
   <dl>
     <dt class="font-medium">Shipping Address</dt>
-    <dd class="mt-1 text-gray-500">Shipping Address goes here</dd>
+    <dd class="mt-1 text-gray-500">{{confirmationToken?.shipping | address}}</dd>
     <dt class="font-medium">Payment Details</dt>
-    <dd class="mt-1 text-gray-500">Payment Details goes here</dd>
+    <dd class="mt-1 text-gray-500">{{confirmationToken?.payment_method_preview | payment}}</dd>
   </dl>
 </div>
 <div class="mt-6 mx-auto">
