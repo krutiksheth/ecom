@@ -19,11 +19,13 @@ services:
       context: .
       dockerfile: API/Dockerfile
     ports:
-      - "5001:80"
+      - "5001:443"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
       - ASPNETCORE_URLS=https://+:443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/api.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=mycertificate
+      - ConnectionStrings__Redis=redis
     depends_on:
       - redis
 volumes:
