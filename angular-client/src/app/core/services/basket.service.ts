@@ -93,6 +93,10 @@ export class BasketService {
         });
     }
 
+    removeBasket() {
+      this.cookieService.delete(this.basketCookieName);
+    }
+
     private addOrUpdateBasketItem(items: Item[], item: Item, quantity: number) {
         const index = items.findIndex(item => item.productId === item.productId);
         if (index === -1) {

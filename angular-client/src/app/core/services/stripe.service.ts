@@ -1,10 +1,19 @@
 import {inject, Injectable} from '@angular/core';
-import {loadStripe, Stripe, StripeAddressElement, StripeAddressElementOptions, StripeElements} from "@stripe/stripe-js";
+import {
+  ConfirmationToken,
+  loadStripe,
+  Stripe,
+  StripeAddressElement,
+  StripeAddressElementOptions,
+  StripeElements,
+  StripePaymentElement
+} from "@stripe/stripe-js";
 import {environment} from "../../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {BasketService} from "./basket.service";
 import {firstValueFrom, map} from "rxjs";
 import {Basket} from "../../shared/models/basket";
+import {AccountService} from "./account.service";
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +21,12 @@ import {Basket} from "../../shared/models/basket";
 export class StripeService {
   baseUrl = environment.apiUrl;
   http = inject(HttpClient);
+  accountService = inject(AccountService);
   stripePromise: Promise<Stripe | null>;
   basketService = inject(BasketService);
   elements?: StripeElements;
   addressElements?: StripeAddressElement;
+  paymentElement?: StripePaymentElement;
 
   constructor() {
     this.stripePromise = loadStripe(environment.stripePublicKey);
@@ -44,12 +55,45 @@ export class StripeService {
     return this.elements;
   }
 
-  async createAddressElement() {
-    if (!this.addressElements) {
+  async createPaymentElement() {
+    if (!this.paymentElement) {
       const elements = await this.initializeElements();
       if (elements) {
+        this.paymentElement = elements.create("payment");
+      } else {
+        throw new Error("Element instance has not been initialized");
+      }
+    }
+
+    return this.paymentElement;
+  }
+
+  async createAddressElement() {
+    if (!this.addressElements) {
+      this.accountService.getAddresses();
+      const elements = await this.initializeElements();
+      let defaultValues: StripeAddressElementOptions['defaultValues'] = {};
+
+      if (elements) {
+        const address = this.accountService.address;
+
+        if (address) {
+          defaultValues.name = address.name;
+          defaultValues.address = {
+            line1: address.line1,
+            line2: address.line2,
+            city: address.city,
+            state: address.state,
+            country: address.country,
+            postal_code: address.postal_code,
+          };
+        }
+
+        console.log("defaultValues", defaultValues);
+
         const options: StripeAddressElementOptions = {
           mode: "shipping",
+          defaultValues: defaultValues
         };
 
         this.addressElements = elements.create("address", options);
@@ -72,5 +116,51 @@ export class StripeService {
         return basket;
       })
     )
+  }
+
+  async createConfirmationToken() {
+    const stripe = await this.getStripeInstance();
+    const elements = await this.initializeElements();
+    const result = await elements.submit();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    if (stripe) {
+      return await stripe.createConfirmationToken({elements});
+    } else {
+      throw new Error("Stripe not initialized");
+    }
+  }
+
+  async confirmPayment(confirmationToken: ConfirmationToken) {
+    const stripe = await this.getStripeInstance();
+    const elements = await this.initializeElements();
+    const result = await elements.submit();
+
+    if (result.error) {
+      throw new Error(result.error.message);
+    }
+
+    const clientSecret = this.basketService.basket()?.clientSecret;
+
+    if(stripe && clientSecret) {
+      return await stripe.confirmPayment({
+        clientSecret: clientSecret,
+        confirmParams: {
+          confirmation_token: confirmationToken.id
+        },
+        redirect:"if_required"
+      });
+    }else{
+      throw new Error("Unable to confirm payment, Stripe or client secret is not initialized");
+    }
+  }
+
+  disposeElements() {
+    this.elements = undefined;
+    this.addressElements = undefined;
+    this.paymentElement = undefined;
   }
 }

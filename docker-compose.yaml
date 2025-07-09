@@ -14,5 +14,19 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+  api:
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    ports:
+      - "5001:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/ssl/api.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=mycertificate
+      - ConnectionStrings__Redis=redis
+    depends_on:
+      - redis
 volumes:
-  redis-data:   
+  redis-data:
